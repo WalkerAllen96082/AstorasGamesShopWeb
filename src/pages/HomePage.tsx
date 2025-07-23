@@ -6,6 +6,7 @@ import {
   Paper,
   Skeleton,
   Alert,
+  IconButton,
 } from '@mui/material';
 import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
