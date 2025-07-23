@@ -60,10 +60,10 @@ export const HomePage: React.FC = () => {
       </Typography>
       <Grid container spacing={3}>
         {loading
-          ? Array.from({ length: 4 }, (_, index) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={index}>
+          ? Array.from({ length: 8 }, (_, index) => (
+              <Grid item xs={6} sm={3} md={3} lg={3} xl={3} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={80} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -71,14 +71,14 @@ export const HomePage: React.FC = () => {
               </Grid>
             ))
           : games.map((game) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={game.id}>
+              <Grid item xs={6} sm={3} md={3} lg={3} xl={3} key={game.id}>
                 <ProductCard item={game} type="game" compact={true} />
               </Grid>
             ))}
       </Grid>
       {!loading && games.length === 0 && (
         <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-          No games found in this category yet.
+          No se encontraron juegos en esta categoría aún.
         </Typography>
       )}
     </Paper>
@@ -100,14 +100,14 @@ export const HomePage: React.FC = () => {
             mb: 2,
           }}
         >
-          Welcome to Astora's Games Shop
+          Bienvenido a la Tienda de Juegos de Astora
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}
         >
-          Discover amazing games, electronics, and services. Find your next favorite game or get the tech support you need.
+          Descubre juegos increíbles, electrónicos y servicios. Encuentra tu próximo juego favorito o consigue el soporte técnico que necesitas.
         </Typography>
       </Box>
 
@@ -128,6 +128,8 @@ export const HomePage: React.FC = () => {
       </Box>
       <GameSection title="🔥 Most Viewed Games" games={mostViewed} loading={loading} />
       <GameSection title="✨ Newly Added & Updated" games={newlyAdded} loading={loading} />
+      <GameSection title="🔥 Juegos Más Vistos" games={mostViewed} loading={loading} />
+      <GameSection title="✨ Recién Agregados y Actualizados" games={newlyAdded} loading={loading} />
     </Layout>
   );
 };

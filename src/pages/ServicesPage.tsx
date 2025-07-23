@@ -88,14 +88,14 @@ export const ServicesPage: React.FC = () => {
             mb: 2,
           }}
         >
-          Services Offered
+          Servicios Ofrecidos
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}
         >
-          Professional services to help you with your tech needs. Expert support when you need it most.
+          Servicios profesionales para ayudarte con tus necesidades tecnológicas. Soporte experto cuando más lo necesitas.
         </Typography>
       </Box>
 
@@ -110,7 +110,7 @@ export const ServicesPage: React.FC = () => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Search services"
+              label="Buscar servicios"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -124,14 +124,14 @@ export const ServicesPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
-              <InputLabel>Sort by</InputLabel>
+              <InputLabel>Ordenar por</InputLabel>
               <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                label="Sort by"
+                label="Ordenar por"
               >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="price">Price</MenuItem>
+                <MenuItem value="name">Nombre</MenuItem>
+                <MenuItem value="price">Precio</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -141,9 +141,9 @@ export const ServicesPage: React.FC = () => {
       <Grid container spacing={2}>
         {loading
           ? Array.from({ length: 20 }, (_, index) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={index}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={140} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -151,7 +151,7 @@ export const ServicesPage: React.FC = () => {
               </Grid>
             ))
           : paginatedServices.map((service) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={service.id}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={service.id}>
                 <ProductCard item={service} type="service" />
               </Grid>
             ))}
@@ -178,12 +178,12 @@ export const ServicesPage: React.FC = () => {
       {!loading && filteredAndSortedServices.length === 0 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h6" gutterBottom>
-            No services found
+            No se encontraron servicios
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {searchTerm
-              ? 'Try adjusting your search criteria.'
-              : 'No services have been added yet.'}
+              ? 'Intenta ajustar tus criterios de búsqueda.'
+              : 'No se han agregado servicios aún.'}
           </Typography>
         </Paper>
       )}

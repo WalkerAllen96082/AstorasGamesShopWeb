@@ -66,12 +66,12 @@ export const AdminPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
             <AdminIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
             <Typography variant="h4" component="h1" gutterBottom>
-              {isSignUp ? 'Create Admin Account' : 'Admin Login'}
+              {isSignUp ? 'Crear Cuenta de Administrador' : 'Inicio de Sesión de Administrador'}
             </Typography>
             <Typography variant="body1" color="text.secondary" textAlign="center">
               {isSignUp 
-                ? 'Create a new admin account to manage your store'
-                : 'Access the admin dashboard to manage your store'
+                ? 'Crea una nueva cuenta de administrador para gestionar tu tienda'
+                : 'Accede al panel de administración para gestionar tu tienda'
               }
             </Typography>
           </Box>
@@ -87,7 +87,7 @@ export const AdminPage: React.FC = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Email"
+                  label="Correo Electrónico"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -98,7 +98,7 @@ export const AdminPage: React.FC = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Password"
+                  label="Contraseña"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -110,7 +110,7 @@ export const AdminPage: React.FC = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Confirm Password"
+                    label="Confirmar Contraseña"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -129,8 +129,8 @@ export const AdminPage: React.FC = () => {
                   sx={{ mt: 2 }}
                 >
                   {loading 
-                    ? (isSignUp ? 'Creating Account...' : 'Signing In...')
-                    : (isSignUp ? 'Create Account' : 'Sign In')
+                    ? (isSignUp ? 'Creando Cuenta...' : 'Iniciando Sesión...')
+                    : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')
                   }
                 </Button>
               </Grid>
@@ -146,8 +146,8 @@ export const AdminPage: React.FC = () => {
                   disabled={loading}
                 >
                   {isSignUp 
-                    ? 'Already have an account? Sign In'
-                    : 'Need an account? Create Admin Account'
+                    ? '¿Ya tienes una cuenta? Iniciar Sesión'
+                    : '¿Necesitas una cuenta? Crear Cuenta de Administrador'
                   }
                 </Button>
               </Grid>

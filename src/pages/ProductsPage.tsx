@@ -91,14 +91,14 @@ export const ProductsPage: React.FC = () => {
             mb: 2,
           }}
         >
-          Products Catalog
+          Catálogo de Productos
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}
         >
-          Browse our collection of electronics and accessories. Quality products at great prices.
+          Explora nuestra colección de electrónicos y accesorios. Productos de calidad a excelentes precios.
         </Typography>
       </Box>
 
@@ -113,7 +113,7 @@ export const ProductsPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              label="Search products"
+              label="Buscar productos"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -127,28 +127,28 @@ export const ProductsPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
-              <InputLabel>Category</InputLabel>
+              <InputLabel>Categoría</InputLabel>
               <Select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                label="Category"
+                label="Categoría"
               >
-                <MenuItem value="all">All Categories</MenuItem>
-                <MenuItem value="electronics">Electronics</MenuItem>
-                <MenuItem value="accessory">Accessories</MenuItem>
+                <MenuItem value="all">Todas las Categorías</MenuItem>
+                <MenuItem value="electronics">Electrónicos</MenuItem>
+                <MenuItem value="accessory">Accesorios</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
-              <InputLabel>Sort by</InputLabel>
+              <InputLabel>Ordenar por</InputLabel>
               <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                label="Sort by"
+                label="Ordenar por"
               >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="price">Price</MenuItem>
+                <MenuItem value="name">Nombre</MenuItem>
+                <MenuItem value="price">Precio</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -158,9 +158,9 @@ export const ProductsPage: React.FC = () => {
       <Grid container spacing={2}>
         {loading
           ? Array.from({ length: 20 }, (_, index) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={index}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={140} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -168,7 +168,7 @@ export const ProductsPage: React.FC = () => {
               </Grid>
             ))
           : paginatedProducts.map((product) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={product.id}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={product.id}>
                 <ProductCard item={product} type="product" />
               </Grid>
             ))}
@@ -195,12 +195,12 @@ export const ProductsPage: React.FC = () => {
       {!loading && filteredAndSortedProducts.length === 0 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h6" gutterBottom>
-            No products found
+            No se encontraron productos
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {searchTerm || categoryFilter !== 'all'
-              ? 'Try adjusting your search or filter criteria.'
-              : 'No products have been added yet.'}
+              ? 'Intenta ajustar tus criterios de búsqueda o filtro.'
+              : 'No se han agregado productos aún.'}
           </Typography>
         </Paper>
       )}

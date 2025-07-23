@@ -112,14 +112,14 @@ export const GamesPage: React.FC = () => {
             mb: 2,
           }}
         >
-          Games Collection
+          Colección de Juegos
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}
         >
-          Discover amazing games across all platforms. From the latest releases to classic favorites.
+          Descubre juegos increíbles en todas las plataformas. Desde los últimos lanzamientos hasta los clásicos favoritos.
         </Typography>
       </Box>
 
@@ -134,7 +134,7 @@ export const GamesPage: React.FC = () => {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              label="Search games"
+              label="Buscar juegos"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -148,13 +148,13 @@ export const GamesPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
-              <InputLabel>Platform</InputLabel>
+              <InputLabel>Plataforma</InputLabel>
               <Select
                 value={platformFilter}
                 onChange={(e) => setPlatformFilter(e.target.value)}
-                label="Platform"
+                label="Plataforma"
               >
-                <MenuItem value="all">All Platforms</MenuItem>
+                <MenuItem value="all">Todas las Plataformas</MenuItem>
                 {platforms.map((platform) => (
                   <MenuItem key={platform} value={platform}>
                     {platform}
@@ -165,16 +165,16 @@ export const GamesPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
-              <InputLabel>Sort by</InputLabel>
+              <InputLabel>Ordenar por</InputLabel>
               <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                label="Sort by"
+                label="Ordenar por"
               >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="price">Price</MenuItem>
-                <MenuItem value="year">Year</MenuItem>
-                <MenuItem value="views">Most Viewed</MenuItem>
+                <MenuItem value="name">Nombre</MenuItem>
+                <MenuItem value="price">Precio</MenuItem>
+                <MenuItem value="year">Año</MenuItem>
+                <MenuItem value="views">Más Vistos</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -184,9 +184,9 @@ export const GamesPage: React.FC = () => {
       <Grid container spacing={2}>
         {loading
           ? Array.from({ length: 20 }, (_, index) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={index}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={140} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -194,7 +194,7 @@ export const GamesPage: React.FC = () => {
               </Grid>
             ))
           : paginatedGames.map((game) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={game.id}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={game.id}>
                 <ProductCard item={game} type="game" />
               </Grid>
             ))}
@@ -221,12 +221,12 @@ export const GamesPage: React.FC = () => {
       {!loading && filteredAndSortedGames.length === 0 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h6" gutterBottom>
-            No games found
+            No se encontraron juegos
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {searchTerm || platformFilter !== 'all'
-              ? 'Try adjusting your search or filter criteria.'
-              : 'No games have been added yet.'}
+              ? 'Intenta ajustar tus criterios de búsqueda o filtro.'
+              : 'No se han agregado juegos aún.'}
           </Typography>
         </Paper>
       )}

@@ -55,9 +55,9 @@ export const Header: React.FC = () => {
   };
 
   const menuItems = [
-    { label: 'Games', path: '/games', icon: <GamesIcon /> },
-    { label: 'Products', path: '/products', icon: <DevicesIcon /> },
-    { label: 'Services', path: '/services', icon: <ServicesIcon /> },
+    { label: 'Juegos', path: '/games', icon: <GamesIcon /> },
+    { label: 'Productos', path: '/products', icon: <DevicesIcon /> },
+    { label: 'Servicios', path: '/services', icon: <ServicesIcon /> },
   ];
 
   return (
@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
         <Box display="flex" alignItems="center" onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
           <GamesIcon sx={{ mr: 1, color: isDarkMode ? 'primary.main' : 'white' }} />
           <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-            Astora's Games Shop
+            Tienda de Juegos de Astora
           </Typography>
         </Box>
 
@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
         >
           <SearchIcon sx={{ mr: 1, color: 'white' }} />
           <InputBase
-            placeholder="Search games, products, services..."
+            placeholder="Buscar juegos, productos, servicios..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{

@@ -83,13 +83,13 @@ export const CartPage: React.FC = () => {
       <Layout>
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h4" gutterBottom>
-            Your Cart is Empty
+            Tu Carrito Está Vacío
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Add some amazing games, products, or services to your cart!
+            ¡Agrega algunos juegos, productos o servicios increíbles a tu carrito!
           </Typography>
           <Button variant="contained" href="/">
-            Start Shopping
+            Comenzar a Comprar
           </Button>
         </Paper>
       </Layout>
@@ -99,7 +99,7 @@ export const CartPage: React.FC = () => {
   return (
     <Layout>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Shopping Cart ({items.length} items)
+        Carrito de Compras ({items.length} elementos)
       </Typography>
 
       <Grid container spacing={3}>
@@ -125,7 +125,7 @@ export const CartPage: React.FC = () => {
                     
                     {item.type === 'game' && 'platform' in item.item && (
                       <Typography variant="body2" color="text.secondary">
-                        Platform: {item.item.platform}
+                        Plataforma: {item.item.platform}
                       </Typography>
                     )}
                     
@@ -191,7 +191,7 @@ export const CartPage: React.FC = () => {
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, position: 'sticky', top: 100 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-              Order Summary
+              Resumen del Pedido
             </Typography>
             
             <Box sx={{ mb: 2 }}>
@@ -219,7 +219,7 @@ export const CartPage: React.FC = () => {
             </Box>
 
             <Alert severity="info" sx={{ mb: 3 }}>
-              Choose your preferred contact method to complete your order:
+              Elige tu método de contacto preferido para completar tu pedido:
             </Alert>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -233,7 +233,7 @@ export const CartPage: React.FC = () => {
                   '&:hover': { backgroundColor: '#128C7E' }
                 }}
               >
-                Order via WhatsApp
+                Pedir por WhatsApp
               </Button>
 
               <Button
@@ -247,7 +247,7 @@ export const CartPage: React.FC = () => {
                   '&:hover': { backgroundColor: '#0088cc', color: 'white' }
                 }}
               >
-                Order via Telegram
+                Pedir por Telegram
               </Button>
 
               <Button
@@ -256,7 +256,7 @@ export const CartPage: React.FC = () => {
                 startIcon={<EmailIcon />}
                 onClick={handleEmail}
               >
-                Order via Email
+                Pedir por Email
               </Button>
             </Box>
 
@@ -266,7 +266,7 @@ export const CartPage: React.FC = () => {
               onClick={clearCart}
               sx={{ mt: 2, color: 'error.main' }}
             >
-              Clear Cart
+              Vaciar Carrito
             </Button>
           </Paper>
         </Grid>
