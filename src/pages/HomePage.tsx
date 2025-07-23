@@ -7,6 +7,7 @@ import {
   Skeleton,
   Alert,
 } from '@mui/material';
+import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
 import { ProductCard } from '../components/ProductCard';
 import { Game } from '../types';
@@ -59,9 +60,9 @@ export const HomePage: React.FC = () => {
       <Grid container spacing={3}>
         {loading
           ? Array.from({ length: 4 }, (_, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={160} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -69,8 +70,8 @@ export const HomePage: React.FC = () => {
               </Grid>
             ))
           : games.map((game) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={game.id}>
-                <ProductCard item={game} type="game" />
+              <Grid item xs={6} sm={4} md={3} lg={2.4} key={game.id}>
+                <ProductCard item={game} type="game" compact={true} />
               </Grid>
             ))}
       </Grid>
@@ -115,6 +116,15 @@ export const HomePage: React.FC = () => {
         </Alert>
       )}
 
+      {/* Scroll to top button */}
+      <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <IconButton
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
+      </Box>
       <GameSection title="🔥 Most Viewed Games" games={mostViewed} loading={loading} />
       <GameSection title="✨ Newly Added & Updated" games={newlyAdded} loading={loading} />
     </Layout>

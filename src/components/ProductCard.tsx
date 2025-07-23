@@ -30,7 +30,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   };
 
   const handleViewDetails = () => {
-    navigate(`/${type}s/${item.id}`);
+    if (type === 'game') {
+      navigate(`/games/${item.id}`);
+    } else if (type === 'product') {
+      navigate(`/products/${item.id}`);
+    } else if (type === 'service') {
+      navigate(`/services/${item.id}`);
+    }
   };
 
   const getCover = () => {
@@ -88,42 +94,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       
       <CardMedia
         component="img"
-        height={compact ? 140 : 200}
+        height={compact ? 120 : 200}
         image={getCover()}
         alt={item.name}
         sx={{ objectFit: 'cover' }}
       />
       
-      <CardContent sx={{ flexGrow: 1, p: compact ? 1.5 : 2 }}>
-        <Typography gutterBottom variant={compact ? 'body1' : 'h6'} component="div" noWrap>
+      <CardContent sx={{ flexGrow: 1, p: compact ? 1 : 2 }}>
+        <Typography gutterBottom variant={compact ? 'body2' : 'h6'} component="div" noWrap>
           {item.name}
         </Typography>
 
         {type === 'game' && 'platform' in item && (
           <Chip
             label={item.platform}
-            size="small"
+            size={compact ? 'small' : 'small'}
             color="secondary"
-            sx={{ mb: 1 }}
+            sx={{ mb: compact ? 0.5 : 1, fontSize: compact ? '0.65rem' : '0.75rem' }}
           />
         )}
 
         {type === 'game' && 'year' in item && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {item.year} • {('size' in item) ? item.size : 'N/A'}
+          <Typography variant={compact ? 'caption' : 'body2'} color="text.secondary" sx={{ mb: compact ? 0.5 : 1 }}>
+            {compact ? item.year : `${item.year} • ${('size' in item) ? item.size : 'N/A'}`}
           </Typography>
         )}
 
         <Typography
-          variant="body2"
+          variant={compact ? 'caption' : 'body2'}
           color="text.secondary"
           sx={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: compact ? 2 : 3,
+            WebkitLineClamp: compact ? 1 : 3,
             WebkitBoxOrient: 'vertical',
-            mb: 2,
+            mb: compact ? 1 : 2,
           }}
         >
           {item.description}
@@ -131,7 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
           <Typography
-            variant={compact ? 'h6' : 'h5'}
+            variant={compact ? 'body2' : 'h5'}
             component="div"
             sx={{ 
               fontWeight: 700,
@@ -142,7 +148,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton size="small" onClick={handleViewDetails} color="primary">
+            <IconButton size={compact ? 'small' : 'small'} onClick={handleViewDetails} color="primary">
               <ViewIcon />
             </IconButton>
             <Button
@@ -150,7 +156,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleAddToCart}
-              sx={{ minWidth: 'auto' }}
+              sx={{ minWidth: 'auto', fontSize: compact ? '0.7rem' : '0.875rem' }}
             >
               {compact ? '' : 'Add'}
             </Button>

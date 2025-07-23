@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
       <Toolbar sx={{ gap: 2 }}>
         {/* Logo and Title */}
         <Box display="flex" alignItems="center" onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
-          <GamesIcon sx={{ mr: 1, color: 'primary.main' }} />
+          <GamesIcon sx={{ mr: 1, color: isDarkMode ? 'primary.main' : 'white' }} />
           <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
             Astora's Games Shop
           </Typography>

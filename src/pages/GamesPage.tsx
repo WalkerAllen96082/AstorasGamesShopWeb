@@ -14,6 +14,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
+import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
 import { ProductCard } from '../components/ProductCard';
 import { Game, Platform } from '../types';
@@ -41,6 +42,9 @@ export const GamesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [platformFilter, setPlatformFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'year' | 'views'>('name');
+
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchGames();
@@ -82,6 +86,13 @@ export const GamesPage: React.FC = () => {
           return 0;
       }
     });
+
+  const paginatedGames = filteredAndSortedGames.slice(
+    page * itemsPerPage,
+    page * itemsPerPage + itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredAndSortedGames.length / itemsPerPage);
 
   return (
     <Layout>
@@ -168,24 +179,42 @@ export const GamesPage: React.FC = () => {
         </Grid>
       </Paper>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {loading
-          ? Array.from({ length: 8 }, (_, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          ? Array.from({ length: 20 }, (_, index) => (
+              <Grid item xs={6} sm={4} md={3} lg={2.4} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={160} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
                 </Box>
               </Grid>
             ))
-          : filteredAndSortedGames.map((game) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={game.id}>
+          : paginatedGames.map((game) => (
+              <Grid item xs={6} sm={4} md={3} lg={2.4} key={game.id}>
                 <ProductCard item={game} type="game" />
               </Grid>
             ))}
       </Grid>
+
+      {!loading && totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <Button
+                key={index}
+                variant={page === index ? 'contained' : 'outlined'}
+                onClick={() => setPage(index)}
+                size="small"
+                sx={{ minWidth: 40 }}
+              >
+                {index + 1}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+      )}
 
       {!loading && filteredAndSortedGames.length === 0 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -199,6 +228,16 @@ export const GamesPage: React.FC = () => {
           </Typography>
         </Paper>
       )}
+
+      {/* Scroll to top button */}
+      <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <IconButton
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
+      </Box>
     </Layout>
   );
 };

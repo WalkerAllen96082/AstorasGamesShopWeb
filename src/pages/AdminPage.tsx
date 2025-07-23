@@ -9,6 +9,7 @@ import {
   Grid,
 } from '@mui/material';
 import { ManageAccounts as AdminIcon } from '@mui/icons-material';
+import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDashboard } from '../components/Admin/AdminDashboard';
@@ -152,6 +153,16 @@ export const AdminPage: React.FC = () => {
             </Grid>
           </Box>
         </Paper>
+      </Box>
+
+      {/* Scroll to top button */}
+      <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <IconButton
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
       </Box>
     </Layout>
   );

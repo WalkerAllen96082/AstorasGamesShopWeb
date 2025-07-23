@@ -20,6 +20,7 @@ import {
   WhatsApp as WhatsAppIcon,
   Telegram as TelegramIcon,
   Email as EmailIcon,
+  ArrowUpward as ArrowUpwardIcon,
 } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
 import { useCart } from '../contexts/CartContext';
@@ -270,6 +271,16 @@ export const CartPage: React.FC = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Scroll to top button */}
+      <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <IconButton
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
+      </Box>
     </Layout>
   );
 };
