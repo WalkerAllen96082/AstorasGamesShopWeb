@@ -94,7 +94,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       
       <CardMedia
         component="img"
-        height={compact ? 120 : 200}
+        height={compact ? 100 : 140}
         image={getCover()}
         alt={item.name}
         sx={{ objectFit: 'cover' }}

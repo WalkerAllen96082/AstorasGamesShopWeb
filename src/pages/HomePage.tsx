@@ -61,9 +61,9 @@ export const HomePage: React.FC = () => {
       <Grid container spacing={3}>
         {loading
           ? Array.from({ length: 4 }, (_, index) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} key={index}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={index}>
                 <Box>
-                  <Skeleton variant="rectangular" height={160} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
                   <Skeleton variant="text" height={20} width="60%" />
                   <Skeleton variant="text" height={60} />
@@ -71,7 +71,7 @@ export const HomePage: React.FC = () => {
               </Grid>
             ))
           : games.map((game) => (
-              <Grid item xs={6} sm={4} md={3} lg={2.4} key={game.id}>
+              <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={game.id}>
                 <ProductCard item={game} type="game" compact={true} />
               </Grid>
             ))}
