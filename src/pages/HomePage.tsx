@@ -126,8 +126,6 @@ export const HomePage: React.FC = () => {
           <ArrowUpwardIcon />
         </IconButton>
       </Box>
-      <GameSection title="🔥 Most Viewed Games" games={mostViewed} loading={loading} />
-      <GameSection title="✨ Newly Added & Updated" games={newlyAdded} loading={loading} />
       <GameSection title="🔥 Juegos Más Vistos" games={mostViewed} loading={loading} />
       <GameSection title="✨ Recién Agregados y Actualizados" games={newlyAdded} loading={loading} />
     </Layout>
