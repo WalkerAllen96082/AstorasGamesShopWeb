@@ -27,6 +27,7 @@ import {
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCart } from '../../contexts/CartContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Sidebar } from './Sidebar';
 
 export const Header: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -38,6 +39,7 @@ export const Header: React.FC = () => {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,11 +65,23 @@ export const Header: React.FC = () => {
   return (
     <AppBar position="sticky" elevation={2}>
       <Toolbar sx={{ gap: 2 }}>
+        {/* Sidebar Toggle */}
+        <IconButton color="inherit" onClick={() => setSidebarOpen(true)}>
+          <MenuIcon />
+        </IconButton>
+
         {/* Logo and Title */}
         <Box display="flex" alignItems="center" onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
-          <GamesIcon sx={{ mr: 1, color: isDarkMode ? 'primary.main' : 'white' }} />
-          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-            Tienda de Juegos de Astora
+          <GamesIcon sx={{ 
+            mr: isMobile ? 0 : 1, 
+            color: isDarkMode ? 'primary.main' : 'white',
+            fontSize: isMobile ? 32 : 24
+          }} />
+          {!isMobile && (
+            <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+              Tienda de Juegos de Astora
+            </Typography>
+          )}
           </Typography>
         </Box>
 
@@ -106,9 +120,6 @@ export const Header: React.FC = () => {
           {/* Navigation Menu */}
           {isMobile ? (
             <>
-              <IconButton color="inherit" onClick={handleMenuOpen}>
-                <MenuIcon />
-              </IconButton>
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
@@ -168,6 +179,8 @@ export const Header: React.FC = () => {
           </IconButton>
         </Box>
       </Toolbar>
+      
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </AppBar>
   );
 };

@@ -32,7 +32,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
 
   const getRequiredFields = () => {
     if (type === 'game') {
-      return ['cover', 'name', 'size', 'year', 'platform', 'price', 'currency', 'description', 'status'];
+      return ['cover', 'name', 'size', 'year', 'platform', 'price', 'currency', 'description', 'status', 'genre'];
     } else if (type === 'product') {
       return ['name', 'price', 'currency', 'description', 'image', 'category'];
     } else {
@@ -46,7 +46,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     
     // Add example row for better understanding
     if (type === 'game') {
-      csvContent += 'https://example.com/cover.jpg,Game Name,50 GB,2024,PC Game,29.99,USD,Game description,newly_added\n';
+      csvContent += 'https://example.com/cover.jpg,Game Name,50 GB,2024,PC Game,29.99,USD,Game description,newly_added,Action\n';
     } else if (type === 'product') {
       csvContent += 'Product Name,99.99,USD,Product description,https://example.com/image.jpg,electronics\n';
     } else {
@@ -119,6 +119,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           currency: row.currency || 'USD',
           description: row.description || '',
           status: row.status === 'newly_added' || row.status === 'updated' ? row.status : null,
+          genre: row.genre || null,
           views: 0,
         };
       } else if (type === 'product') {

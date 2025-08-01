@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogActions,
   Grid,
+  Checkbox,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -32,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import { supabase } from '../../lib/supabase';
 import { Game, Product, Service } from '../../types';
+import { BulkActions } from './BulkActions';
 
 export const ProductList: React.FC = () => {
   const [products, setProducts] = useState<(Game | Product | Service)[]>([]);
@@ -42,6 +44,7 @@ export const ProductList: React.FC = () => {
   const [filterType, setFilterType] = useState<'all' | 'game' | 'product' | 'service'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'created_at'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; item: any; type: string }>({
     open: false,
     item: null,
@@ -120,158 +123,202 @@ export const ProductList: React.FC = () => {
     page * rowsPerPage + rowsPerPage
   );
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedItems(paginatedProducts.map((p: any) => p.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectItem = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedItems(prev => [...prev, id]);
+    } else {
+      setSelectedItems(prev => prev.filter(item => item !== id));
+    }
+  };
+
+  const isAllSelected = paginatedProducts.length > 0 && selectedItems.length === paginatedProducts.length;
+  const isIndeterminate = selectedItems.length > 0 && selectedItems.length < paginatedProducts.length;
+
   return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Product Catalog
-      </Typography>
+    <Box>
+      <BulkActions
+        selectedItems={selectedItems}
+        itemType={filterType === 'all' ? 'game' : filterType}
+        onSuccess={() => {
+          fetchProducts();
+          setSelectedItems([]);
+        }}
+        onClearSelection={() => setSelectedItems([])}
+      />
+      
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+          Catálogo de Productos
+        </Typography>
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={4}>
-          <TextField
-            fullWidth
-            label="Search products"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-            }}
-          />
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Buscar productos"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Filtrar por Tipo</InputLabel>
+              <Select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value as any)}
+                label="Filtrar por Tipo"
+              >
+                <MenuItem value="all">Todos los Productos</MenuItem>
+                <MenuItem value="game">Juegos</MenuItem>
+                <MenuItem value="product">Productos</MenuItem>
+                <MenuItem value="service">Servicios</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Ordenar por</InputLabel>
+              <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                label="Ordenar por"
+              >
+                <MenuItem value="name">Nombre</MenuItem>
+                <MenuItem value="price">Precio</MenuItem>
+                <MenuItem value="created_at">Fecha Agregado</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>Orden</InputLabel>
+              <Select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as any)}
+                label="Orden"
+              >
+                <MenuItem value="asc">Ascendente</MenuItem>
+                <MenuItem value="desc">Descendente</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Filter by Type</InputLabel>
-            <Select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as any)}
-              label="Filter by Type"
-            >
-              <MenuItem value="all">All Products</MenuItem>
-              <MenuItem value="game">Games</MenuItem>
-              <MenuItem value="product">Products</MenuItem>
-              <MenuItem value="service">Services</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <FormControl fullWidth>
-            <InputLabel>Sort by</InputLabel>
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              label="Sort by"
-            >
-              <MenuItem value="name">Name</MenuItem>
-              <MenuItem value="price">Price</MenuItem>
-              <MenuItem value="created_at">Date Added</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Order</InputLabel>
-            <Select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as any)}
-              label="Order"
-            >
-              <MenuItem value="asc">Ascending</MenuItem>
-              <MenuItem value="desc">Descending</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
 
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Platform</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedProducts.map((product: any) => (
-              <TableRow key={`${product.type}-${product.id}`}>
-                <TableCell>{product.name}</TableCell>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
                 <TableCell>
-                  <Chip
-                    label={product.type}
-                    color={
-                      product.type === 'game' ? 'primary' :
-                      product.type === 'product' ? 'secondary' : 'default'
-                    }
-                    size="small"
+                  <Checkbox
+                    checked={isAllSelected}
+                    indeterminate={isIndeterminate}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </TableCell>
-                <TableCell>
-                  {product.currency} ${product.price.toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  {product.platform || product.category || 'N/A'}
-                </TableCell>
-                <TableCell>
-                  {product.status && (
+                <TableCell>Nombre</TableCell>
+                <TableCell>Tipo</TableCell>
+                <TableCell>Precio</TableCell>
+                <TableCell>Plataforma</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedProducts.map((product: any) => (
+                <TableRow key={`${product.type}-${product.id}`}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedItems.includes(product.id)}
+                      onChange={(e) => handleSelectItem(product.id, e.target.checked)}
+                    />
+                  </TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>
                     <Chip
-                      label={product.status === 'newly_added' ? 'New' : 'Updated'}
-                      color="warning"
+                      label={product.type === 'game' ? 'Juego' : product.type === 'product' ? 'Producto' : 'Servicio'}
+                      color={
+                        product.type === 'game' ? 'primary' :
+                        product.type === 'product' ? 'secondary' : 'default'
+                      }
                       size="small"
                     />
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton size="small" color="primary">
-                      <ViewIcon />
-                    </IconButton>
-                    <IconButton size="small" color="secondary">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDeleteClick(product, product.type)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  </TableCell>
+                  <TableCell>
+                    {product.currency} ${product.price.toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    {product.platform || product.category || 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    {product.status && (
+                      <Chip
+                        label={product.status === 'newly_added' ? 'Nuevo' : 'Actualizado'}
+                        color="warning"
+                        size="small"
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton size="small" color="primary">
+                        <ViewIcon />
+                      </IconButton>
+                      <IconButton size="small" color="secondary">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteClick(product, product.type)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-      <TablePagination
-        component="div"
-        count={filteredProducts.length}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setPage(0);
-        }}
-      />
+        <TablePagination
+          component="div"
+          count={filteredProducts.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
+        />
 
-      <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, item: null, type: '' })}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete "{deleteDialog.item?.name}"? This action cannot be undone.
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog({ open: false, item: null, type: '' })}>
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Paper>
+        <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, item: null, type: '' })}>
+          <DialogTitle>Confirmar Eliminación</DialogTitle>
+          <DialogContent>
+            ¿Estás seguro de que quieres eliminar "{deleteDialog.item?.name}"? Esta acción no se puede deshacer.
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialog({ open: false, item: null, type: '' })}>
+              Cancelar
+            </Button>
+            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+              Eliminar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Paper>
+    </Box>
   );
 };

@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Grid,
   Typography,
   Box,
-  Paper,
-  Skeleton,
   Alert,
   IconButton,
 } from '@mui/material';
 import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
-import { ProductCard } from '../components/ProductCard';
+import { GameCarousel } from '../components/GameCarousel';
+import { Banner } from '../components/Banner';
 import { Game } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -53,39 +51,10 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  const GameSection: React.FC<{ title: string; games: Game[]; loading: boolean }> = ({ title, games, loading }) => (
-    <Paper sx={{ p: 3, mb: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
-        {title}
-      </Typography>
-      <Grid container spacing={3}>
-        {loading
-          ? Array.from({ length: 8 }, (_, index) => (
-              <Grid item xs={6} sm={3} md={3} lg={3} xl={3} key={index}>
-                <Box>
-                  <Skeleton variant="rectangular" height={80} sx={{ mb: 2 }} />
-                  <Skeleton variant="text" height={30} />
-                  <Skeleton variant="text" height={20} width="60%" />
-                  <Skeleton variant="text" height={60} />
-                </Box>
-              </Grid>
-            ))
-          : games.map((game) => (
-              <Grid item xs={6} sm={3} md={3} lg={3} xl={3} key={game.id}>
-                <ProductCard item={game} type="game" compact={true} />
-              </Grid>
-            ))}
-      </Grid>
-      {!loading && games.length === 0 && (
-        <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-          No se encontraron juegos en esta categoría aún.
-        </Typography>
-      )}
-    </Paper>
-  );
-
   return (
     <Layout>
+      <Banner />
+      
       <Box sx={{ mb: 4 }}>
         <Typography
           variant="h2"
@@ -117,6 +86,9 @@ export const HomePage: React.FC = () => {
         </Alert>
       )}
 
+      <GameCarousel title="🔥 Juegos Más Vistos" games={mostViewed} loading={loading} />
+      <GameCarousel title="✨ Recién Agregados y Actualizados" games={newlyAdded} loading={loading} />
+
       {/* Scroll to top button */}
       <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
         <IconButton
@@ -126,8 +98,6 @@ export const HomePage: React.FC = () => {
           <ArrowUpwardIcon />
         </IconButton>
       </Box>
-      <GameSection title="🔥 Juegos Más Vistos" games={mostViewed} loading={loading} />
-      <GameSection title="✨ Recién Agregados y Actualizados" games={newlyAdded} loading={loading} />
     </Layout>
   );
 };

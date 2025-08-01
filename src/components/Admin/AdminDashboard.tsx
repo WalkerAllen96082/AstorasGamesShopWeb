@@ -21,6 +21,7 @@ import { Layout } from '../Layout/Layout';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProductManager } from './ProductManager';
 import { ProductList } from './ProductList';
+import { BannerManager } from './BannerManager';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,6 +74,7 @@ export const AdminDashboard: React.FC = () => {
           <Tab icon={<DashboardIcon />} label="Overview" />
           <Tab icon={<AddIcon />} label="Add Products" />
           <Tab icon={<ListIcon />} label="Manage Products" />
+          <Tab icon={<DashboardIcon />} label="Banners" />
         </Tabs>
       </Paper>
 
@@ -120,6 +122,10 @@ export const AdminDashboard: React.FC = () => {
 
       <TabPanel value={tabValue} index={2}>
         <ProductList />
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={3}>
+        <BannerManager />
       </TabPanel>
     </Layout>
   );

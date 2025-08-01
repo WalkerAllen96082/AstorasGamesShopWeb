@@ -14,12 +14,13 @@ import {
   InputAdornment,
   IconButton,
   Button,
+  Chip,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
 import { ProductCard } from '../components/ProductCard';
-import { Game, Platform } from '../types';
+import { Game, Platform, GameGenre } from '../types';
 import { supabase } from '../lib/supabase';
 
 const platforms: Platform[] = [
@@ -37,12 +38,37 @@ const platforms: Platform[] = [
   'PlayStation Portable',
 ];
 
+const gameGenres: GameGenre[] = [
+  'Action',
+  'Action RPG',
+  'Aventura Gráfica',
+  'Aventura-Acción',
+  'Beat Em-Up',
+  'Conducción',
+  'Estrategia',
+  'Fighting',
+  'Hack and Slash',
+  'Metroidvania',
+  'MMO',
+  'Musou',
+  'Plataformas',
+  'Rogelike',
+  'RPG',
+  'Shooter',
+  'Simulación',
+  'Sports',
+  'Survival',
+  'Survival Horror',
+];
+
 export const GamesPage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [platformFilter, setPlatformFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [genreFilter, setGenreFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'year' | 'views'>('name');
 
   const [page, setPage] = useState(0);
@@ -72,7 +98,9 @@ export const GamesPage: React.FC = () => {
     .filter(game => {
       const matchesSearch = game.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPlatform = platformFilter === 'all' || game.platform === platformFilter;
-      return matchesSearch && matchesPlatform;
+      const matchesStatus = statusFilter === 'all' || game.status === statusFilter;
+      const matchesGenre = genreFilter === 'all' || (game as any).genre === genreFilter;
+      return matchesSearch && matchesPlatform && matchesStatus && matchesGenre;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -95,6 +123,9 @@ export const GamesPage: React.FC = () => {
   );
 
   const totalPages = Math.ceil(filteredAndSortedGames.length / itemsPerPage);
+
+  const showStatusFilters = platformFilter === 'PC Game' || platformFilter === 'PlayStation 4' || platformFilter === 'Nintendo Switch';
+  const showGenreFilters = platformFilter === 'PC Game';
 
   return (
     <Layout>
@@ -129,6 +160,98 @@ export const GamesPage: React.FC = () => {
         </Alert>
       )}
 
+      {/* Platform Filter Buttons */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Filtrar por Plataforma
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+          <Chip
+            label="Todas"
+            onClick={() => {
+              setPlatformFilter('all');
+              setStatusFilter('all');
+              setGenreFilter('all');
+            }}
+            color={platformFilter === 'all' ? 'primary' : 'default'}
+            variant={platformFilter === 'all' ? 'filled' : 'outlined'}
+          />
+          {platforms.map((platform) => (
+            <Chip
+              key={platform}
+              label={platform}
+              onClick={() => {
+                setPlatformFilter(platform);
+                setStatusFilter('all');
+                setGenreFilter('all');
+              }}
+              color={platformFilter === platform ? 'primary' : 'default'}
+              variant={platformFilter === platform ? 'filled' : 'outlined'}
+            />
+          ))}
+        </Box>
+
+        {/* Status Filters */}
+        {showStatusFilters && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Filtrar por Estado
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                label="Todos"
+                onClick={() => setStatusFilter('all')}
+                color={statusFilter === 'all' ? 'secondary' : 'default'}
+                variant={statusFilter === 'all' ? 'filled' : 'outlined'}
+                size="small"
+              />
+              <Chip
+                label="Recién Agregados"
+                onClick={() => setStatusFilter('newly_added')}
+                color={statusFilter === 'newly_added' ? 'secondary' : 'default'}
+                variant={statusFilter === 'newly_added' ? 'filled' : 'outlined'}
+                size="small"
+              />
+              <Chip
+                label="Actualizados"
+                onClick={() => setStatusFilter('updated')}
+                color={statusFilter === 'updated' ? 'secondary' : 'default'}
+                variant={statusFilter === 'updated' ? 'filled' : 'outlined'}
+                size="small"
+              />
+            </Box>
+          </Box>
+        )}
+
+        {/* Genre Filters for PC Games */}
+        {showGenreFilters && (
+          <Box>
+            <Typography variant="subtitle1" gutterBottom>
+              Filtrar por Género
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                label="Todos"
+                onClick={() => setGenreFilter('all')}
+                color={genreFilter === 'all' ? 'success' : 'default'}
+                variant={genreFilter === 'all' ? 'filled' : 'outlined'}
+                size="small"
+              />
+              {gameGenres.map((genre) => (
+                <Chip
+                  key={genre}
+                  label={genre}
+                  onClick={() => setGenreFilter(genre)}
+                  color={genreFilter === genre ? 'success' : 'default'}
+                  variant={genreFilter === genre ? 'filled' : 'outlined'}
+                  size="small"
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
+      </Paper>
+
       <Paper sx={{ p: 3, mb: 4 }}>
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} md={4}>
@@ -145,23 +268,6 @@ export const GamesPage: React.FC = () => {
                 ),
               }}
             />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Plataforma</InputLabel>
-              <Select
-                value={platformFilter}
-                onChange={(e) => setPlatformFilter(e.target.value)}
-                label="Plataforma"
-              >
-                <MenuItem value="all">Todas las Plataformas</MenuItem>
-                {platforms.map((platform) => (
-                  <MenuItem key={platform} value={platform}>
-                    {platform}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
