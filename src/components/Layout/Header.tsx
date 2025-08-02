@@ -82,7 +82,6 @@ export const Header: React.FC = () => {
               Tienda de Juegos de Astora
             </Typography>
           )}
-          </Typography>
         </Box>
 
         {/* Search Bar */}
