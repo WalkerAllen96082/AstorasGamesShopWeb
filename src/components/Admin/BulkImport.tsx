@@ -32,6 +32,16 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
 
   const getRequiredFields = () => {
     if (type === 'game') {
+      return ['cover', 'name', 'size', 'year', 'platform', 'price', 'currency', 'description'];
+    } else if (type === 'product') {
+      return ['name', 'price', 'currency', 'description', 'image', 'category'];
+    } else {
+      return ['cover', 'name', 'price', 'currency', 'description', 'duration'];
+    }
+  };
+
+  const getAllFields = () => {
+    if (type === 'game') {
       return ['cover', 'name', 'size', 'year', 'platform', 'price', 'currency', 'description', 'status', 'genre'];
     } else if (type === 'product') {
       return ['name', 'price', 'currency', 'description', 'image', 'category'];
@@ -41,7 +51,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
   };
 
   const generateTemplate = () => {
-    const fields = getRequiredFields();
+    const fields = getAllFields();
     let csvContent = fields.join(',') + '\n';
     
     // Add example row for better understanding
@@ -97,7 +107,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
         const missingFields = requiredFields.filter(field => !headers.includes(field));
         
         if (missingFields.length > 0) {
-          setError(`Missing required fields: ${missingFields.join(', ')}. Please ensure your CSV has all required columns.`);
+          setError(`Faltan campos requeridos: ${missingFields.join(', ')}. Por favor asegúrate de que tu CSV tenga todas las columnas requeridas. Campos opcionales: ${type === 'game' ? 'status, genre' : 'ninguno'}`);
           return;
         }
         
@@ -109,6 +119,32 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
   const processData = (rawData: any[]) => {
     return rawData.map((row: any) => {
       if (type === 'game') {
+        // Validate platform
+        const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable'];
+        if (!validPlatforms.includes(row.platform)) {
+          throw new Error(`Plataforma inválida: "${row.platform}". Plataformas válidas: ${validPlatforms.join(', ')}`);
+        }
+
+        // Validate currency
+        const validCurrencies = ['USD', 'CUP'];
+        if (!validCurrencies.includes(row.currency)) {
+          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+        }
+
+        // Validate status if provided
+        const validStatuses = ['newly_added', 'updated', '', null, undefined];
+        if (row.status && !validStatuses.includes(row.status)) {
+          throw new Error(`Estado inválido: "${row.status}". Estados válidos: newly_added, updated (o dejar vacío)`);
+        }
+
+        // Validate genre if provided and platform is PC Game
+        if (row.genre && row.platform === 'PC Game') {
+          const validGenres = ['Action', 'Action RPG', 'Aventura Gráfica', 'Aventura-Acción', 'Beat Em-Up', 'Conducción', 'Estrategia', 'Fighting', 'Hack and Slash', 'Metroidvania', 'MMO', 'Musou', 'Plataformas', 'Rogelike', 'RPG', 'Shooter', 'Simulación', 'Sports', 'Survival', 'Survival Horror'];
+          if (!validGenres.includes(row.genre)) {
+            throw new Error(`Género inválido: "${row.genre}". Géneros válidos para PC Game: ${validGenres.join(', ')}`);
+          }
+        }
+
         return {
           cover: row.cover || '',
           name: row.name || '',
@@ -118,11 +154,23 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           price: parseFloat(row.price) || 0,
           currency: row.currency || 'USD',
           description: row.description || '',
-          status: row.status === 'newly_added' || row.status === 'updated' ? row.status : null,
-          genre: row.genre || null,
+          status: (row.status === 'newly_added' || row.status === 'updated') ? row.status : null,
+          genre: (row.genre && row.platform === 'PC Game') ? row.genre : null,
           views: 0,
         };
       } else if (type === 'product') {
+        // Validate currency
+        const validCurrencies = ['USD', 'CUP'];
+        if (!validCurrencies.includes(row.currency)) {
+          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+        }
+
+        // Validate category
+        const validCategories = ['electronics', 'accessory'];
+        if (!validCategories.includes(row.category)) {
+          throw new Error(`Categoría inválida: "${row.category}". Categorías válidas: ${validCategories.join(', ')}`);
+        }
+
         return {
           name: row.name || '',
           price: parseFloat(row.price) || 0,
@@ -132,6 +180,12 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           category: row.category || 'electronics',
         };
       } else {
+        // Validate currency
+        const validCurrencies = ['USD', 'CUP'];
+        if (!validCurrencies.includes(row.currency)) {
+          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+        }
+
         return {
           name: row.name || '',
           price: parseFloat(row.price) || 0,
@@ -158,14 +212,18 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
         .from(tableName)
         .insert(processedData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(`Error de base de datos: ${error.message}. Código: ${error.code}. Detalles: ${error.details || 'No disponible'}`);
+      }
 
       setSuccess(`Successfully imported ${processedData.length} ${type}s!`);
       setTimeout(() => {
         onSuccess();
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Import failed');
+      console.error('Import error:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido durante la importación');
     } finally {
       setLoading(false);
     }
@@ -202,7 +260,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           Download CSV Template
         </Button>
         <Typography variant="body2" color="text.secondary">
-          Download the template file and fill it with your {type} data. Required fields: {getRequiredFields().join(', ')}
+          Descarga el archivo plantilla y llénalo con tus datos de {type}. Campos requeridos: {getRequiredFields().join(', ')}{type === 'game' ? '. Campos opcionales: status, genre (solo para PC Game)' : ''}
         </Typography>
       </Box>
 
@@ -243,7 +301,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  {getRequiredFields().map((field) => (
+                  {getAllFields().map((field) => (
                     <TableCell key={field}>{field}</TableCell>
                   ))}
                 </TableRow>
@@ -251,7 +309,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
               <TableBody>
                 {data.slice(0, 10).map((row, index) => (
                   <TableRow key={index}>
-                    {getRequiredFields().map((field) => (
+                    {getAllFields().map((field) => (
                       <TableCell key={field}>{row[field] || 'N/A'}</TableCell>
                     ))}
                   </TableRow>
@@ -261,7 +319,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           </TableContainer>
           {data.length > 10 && (
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Showing first 10 rows of {data.length} total rows
+              Mostrando las primeras 10 filas de {data.length} filas totales
             </Typography>
           )}
         </>
@@ -276,7 +334,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           startIcon={<CancelIcon />}
           disabled={loading}
         >
-          Cancel
+          Cancelar
         </Button>
         {data.length > 0 && (
           <Button
@@ -285,7 +343,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
             startIcon={<UploadIcon />}
             disabled={loading}
           >
-            {loading ? 'Importing...' : `Import ${data.length} Items`}
+            {loading ? 'Importando...' : `Importar ${data.length} Elementos`}
           </Button>
         )}
       </Box>
