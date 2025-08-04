@@ -60,7 +60,7 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
           ? Array.from({ length: 4 }, (_, index) => (
               <Grid item xs={4} sm={3} md={3} lg={3} xl={3} key={index}>
                 <Box>
-                  <Box sx={{ height: 160, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
+                  <Box sx={{ height: 200, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
                   <Box sx={{ height: 20, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
                   <Box sx={{ height: 15, backgroundColor: 'grey.300', width: '60%', borderRadius: 1 }} />
                 </Box>
