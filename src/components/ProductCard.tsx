@@ -161,7 +161,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleAddToCart}
-              sx={{ minWidth: 'auto', fontSize: compact ? '0.7rem' : '0.875rem' }}
+              sx={{ 
+                minWidth: 'auto', 
+                fontSize: compact ? '0.7rem' : '0.875rem',
+                px: compact ? 0.5 : 1
+              }}
             >
               {compact ? '' : 'Add'}
             </Button>
