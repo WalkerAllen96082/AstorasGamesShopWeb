@@ -130,7 +130,7 @@ export const SearchPage: React.FC = () => {
         <Grid container spacing={3}>
           {loading
             ? Array.from({ length: 4 }, (_, index) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                   <Box>
                     <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                     <Skeleton variant="text" height={30} />
@@ -140,7 +140,7 @@ export const SearchPage: React.FC = () => {
                 </Grid>
               ))
             : games.map((game) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={game.id}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={game.id}>
                   <ProductCard item={game} type="game" />
                 </Grid>
               ))}
@@ -152,7 +152,7 @@ export const SearchPage: React.FC = () => {
         <Grid container spacing={3}>
           {loading
             ? Array.from({ length: 4 }, (_, index) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                   <Box>
                     <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                     <Skeleton variant="text" height={30} />
@@ -162,7 +162,7 @@ export const SearchPage: React.FC = () => {
                 </Grid>
               ))
             : products.map((product) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={product.id}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={product.id}>
                   <ProductCard item={product} type="product" />
                 </Grid>
               ))}
@@ -174,7 +174,7 @@ export const SearchPage: React.FC = () => {
         <Grid container spacing={3}>
           {loading
             ? Array.from({ length: 4 }, (_, index) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={index}>
                   <Box>
                     <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                     <Skeleton variant="text" height={30} />
@@ -184,7 +184,7 @@ export const SearchPage: React.FC = () => {
                 </Grid>
               ))
             : services.map((service) => (
-                <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2.4} key={service.id}>
+                <Grid item xs={4} sm={4} md={3} lg={2.4} xl={2.4} key={service.id}>
                   <ProductCard item={service} type="service" />
                 </Grid>
               ))}
