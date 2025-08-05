@@ -47,6 +47,7 @@ export const BannerManager: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
+    image: '',
     active: true,
   });
 
@@ -105,6 +106,7 @@ export const BannerManager: React.FC = () => {
     setFormData({
       title: banner.title,
       content: banner.content,
+      image: (banner as any).image || '',
       active: banner.active,
     });
     setShowForm(true);
@@ -128,7 +130,7 @@ export const BannerManager: React.FC = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', content: '', active: true });
+    setFormData({ title: '', content: '', image: '', active: true });
     setEditingBanner(null);
     setShowForm(false);
     setError('');
@@ -168,6 +170,7 @@ export const BannerManager: React.FC = () => {
             <TableRow>
               <TableCell>Título</TableCell>
               <TableCell>Contenido</TableCell>
+              <TableCell>Imagen</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
@@ -177,6 +180,17 @@ export const BannerManager: React.FC = () => {
               <TableRow key={banner.id}>
                 <TableCell>{banner.title}</TableCell>
                 <TableCell>{banner.content.substring(0, 50)}...</TableCell>
+                <TableCell>
+                  {(banner as any).image ? (
+                    <img 
+                      src={(banner as any).image} 
+                      alt="Banner" 
+                      style={{ width: 50, height: 30, objectFit: 'cover', borderRadius: 4 }}
+                    />
+                  ) : (
+                    'Sin imagen'
+                  )}
+                </TableCell>
                 <TableCell>
                   {banner.active ? 'Activo' : 'Inactivo'}
                 </TableCell>
@@ -216,6 +230,14 @@ export const BannerManager: React.FC = () => {
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               required
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="URL de Imagen (Opcional)"
+              value={formData.image}
+              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              placeholder="https://example.com/banner-image.jpg"
               sx={{ mb: 2 }}
             />
             <FormControlLabel

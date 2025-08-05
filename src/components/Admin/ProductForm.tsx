@@ -14,8 +14,10 @@ import {
   Checkbox,
   Alert,
   InputAdornment,
+  Tabs,
+  Tab,
 } from '@mui/material';
-import { Save as SaveIcon, Cancel as CancelIcon, Image as ImageIcon } from '@mui/icons-material';
+import { Save as SaveIcon, Cancel as CancelIcon, Image as ImageIcon, Upload as UploadIcon, Link as LinkIcon } from '@mui/icons-material';
 import { Platform } from '../../types';
 import { supabase } from '../../lib/supabase';
 
@@ -60,6 +62,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
     updated: false,
   });
 
+  const [imageTab, setImageTab] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -68,6 +73,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        handleInputChange('cover', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const handleStatusChange = (statusType: 'newly_added' | 'updated') => {
     const newStatusChecked = {
       newly_added: statusType === 'newly_added' ? !statusChecked.newly_added : false,
@@ -169,21 +187,79 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Cover Image URL"
-              value={formData.cover}
-              onChange={(e) => handleInputChange('cover', e.target.value)}
-              placeholder="https://example.com/image.jpg or upload from device"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <ImageIcon />
-                  </InputAdornment>
-                ),
-              }}
-              required
-            />
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Imagen de Portada
+              </Typography>
+              <Tabs value={imageTab} onChange={(_, newValue) => setImageTab(newValue)} sx={{ mb: 2 }}>
+                <Tab icon={<LinkIcon />} label="URL" />
+                <Tab icon={<UploadIcon />} label="Subir Archivo" />
+              </Tabs>
+              
+              {imageTab === 0 ? (
+                <TextField
+                  fullWidth
+                  label="URL de la Imagen"
+                  value={formData.cover}
+                  onChange={(e) => handleInputChange('cover', e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ImageIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  required
+                />
+              ) : (
+                <Box>
+                  <input
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="image-upload"
+                    type="file"
+                    onChange={handleFileSelect}
+                  />
+                  <label htmlFor="image-upload">
+                    <Button
+                      variant="outlined"
+                      component="span"
+                      startIcon={<UploadIcon />}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    >
+                      Seleccionar Imagen
+                    </Button>
+                  </label>
+                  {selectedFile && (
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                      Archivo seleccionado: {selectedFile.name}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+              
+              {(formData.cover || imagePreview) && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" gutterBottom>
+                    Vista previa:
+                  </Typography>
+                  <img
+                    src={imagePreview || formData.cover}
+                    alt="Preview"
+                    style={{
+                      width: '100%',
+                      maxWidth: 300,
+                      height: 200,
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      border: '1px solid #ddd'
+                    }}
+                  />
+                </Box>
+              )}
+            </Box>
           </Grid>
 
           <Grid item xs={12} md={6}>
