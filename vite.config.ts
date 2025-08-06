@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    exclude: ['lucide-react', '@mui/icons-material'],
   },
   server: {
     historyApiFallback: true,
