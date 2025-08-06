@@ -80,7 +80,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
         cursor: 'pointer',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         position: 'relative',
-        maxWidth: compact ? 180 : 220,
+       maxWidth: compact ? 160 : 200,
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: theme => 
@@ -95,17 +95,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       
       <CardMedia
         component="img"
-       height={compact ? 200 : 300}
+       height={compact ? 180 : 280}
         image={getCover()}
         alt={item.name}
         sx={{ 
           objectFit: 'cover',
           width: '100%',
-         maxHeight: compact ? 200 : 300,
+         maxHeight: compact ? 180 : 280,
         }}
       />
       
-      <CardContent sx={{ flexGrow: 1, p: compact ? 1 : 2 }}>
+     <CardContent sx={{ flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
         <Typography gutterBottom variant={compact ? 'body2' : 'h6'} component="div" noWrap>
           {item.name}
         </Typography>
@@ -115,7 +115,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
             label={item.platform}
             size={compact ? 'small' : 'small'}
             color="secondary"
-            sx={{ mb: compact ? 0.5 : 1, fontSize: compact ? '0.65rem' : '0.75rem' }}
+           sx={{ mb: compact ? 0.3 : 0.8, fontSize: compact ? '0.6rem' : '0.7rem' }}
           />
         )}
 
@@ -132,9 +132,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: compact ? 1 : 3,
+           WebkitLineClamp: compact ? 2 : 3,
             WebkitBoxOrient: 'vertical',
-            mb: compact ? 1 : 2,
+           mb: compact ? 0.8 : 1.5,
+           fontSize: compact ? '0.65rem' : '0.875rem',
+           lineHeight: compact ? 1.2 : 1.4,
           }}
         >
           {item.description}
@@ -142,11 +144,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
           <Typography
-            variant={compact ? 'body2' : 'h5'}
+           variant={compact ? 'caption' : 'h6'}
             component="div"
             sx={{ 
               fontWeight: 700,
               color: 'primary.main',
+             fontSize: compact ? '0.7rem' : '1rem',
             }}
           >
             {item.currency} ${item.price.toFixed(2)}
@@ -163,11 +166,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               onClick={handleAddToCart}
               sx={{ 
                 minWidth: 'auto', 
-                fontSize: compact ? '0.7rem' : '0.875rem',
-                px: compact ? 0.5 : 1
+               fontSize: compact ? '0.6rem' : '0.8rem',
+               px: compact ? 0.3 : 0.8,
+               py: compact ? 0.2 : 0.4,
               }}
             >
-              {compact ? '' : 'Add'}
+             {compact ? '+' : 'Add'}
             </Button>
           </Box>
         </Box>

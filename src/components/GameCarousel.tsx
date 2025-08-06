@@ -58,7 +58,7 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
       <Grid container spacing={2}>
         {loading
           ? Array.from({ length: 8 }, (_, index) => (
-              <Grid item xs={6} sm={3} md={3} lg={1.5} xl={1.5} key={index}>
+              <Grid item xs={4} sm={3} md={2.4} lg={1.5} xl={1.5} key={index}>
                 <Box>
                   <Box sx={{ height: 200, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
                   <Box sx={{ height: 20, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
@@ -67,7 +67,7 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
               </Grid>
             ))
           : currentGames.map((game) => (
-              <Grid item xs={6} sm={3} md={3} lg={1.5} xl={1.5} key={game.id}>
+              <Grid item xs={4} sm={3} md={2.4} lg={1.5} xl={1.5} key={game.id}>
                 <ProductCard item={game} type="game" compact={true} />
               </Grid>
             ))}

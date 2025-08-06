@@ -59,7 +59,8 @@ export type Platform =
   | 'Nintendo Wii'
   | 'Nintendo 3DS'
   | 'PlayStation 2'
-  | 'PlayStation Portable';
+  | 'PlayStation Portable'
+  | 'PlayStation Vita';
 
 export type GameGenre = 
   | 'Action'

@@ -34,6 +34,7 @@ const platforms: Platform[] = [
   'Nintendo 3DS',
   'PlayStation 2',
   'PlayStation Portable',
+  'PlayStation Vita',
 ];
 
 interface ProductFormProps {
