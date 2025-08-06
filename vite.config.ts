@@ -12,6 +12,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    include: ['prop-types'],
     exclude: ['lucide-react', '@mui/icons-material'],
   },
   server: {
