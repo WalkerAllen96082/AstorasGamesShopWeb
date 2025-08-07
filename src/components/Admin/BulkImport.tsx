@@ -120,7 +120,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     return rawData.map((row: any) => {
       if (type === 'game') {
         // Validate platform
-        const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable'];
+        const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable', 'PlayStation Vita'];
         if (!validPlatforms.includes(row.platform)) {
           throw new Error(`Plataforma inválida: "${row.platform}". Plataformas válidas: ${validPlatforms.join(', ')}`);
         }
