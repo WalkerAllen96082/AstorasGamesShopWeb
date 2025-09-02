@@ -9,14 +9,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
 } from '@mui/material';
-import { Delete as DeleteIcon, SelectAll as SelectAllIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import { supabase } from '../../lib/supabase';
 
 interface BulkActionsProps {

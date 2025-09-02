@@ -35,6 +35,7 @@ interface Banner {
   content: string;
   active: boolean;
   created_at: string;
+  image?: string;
 }
 
 export const BannerManager: React.FC = () => {
@@ -64,7 +65,7 @@ export const BannerManager: React.FC = () => {
 
       if (error) throw error;
       setBanners(data || []);
-    } catch (err) {
+    } catch (_err) {
       setError('Error al cargar banners');
     }
   };
@@ -106,7 +107,7 @@ export const BannerManager: React.FC = () => {
     setFormData({
       title: banner.title,
       content: banner.content,
-      image: (banner as any).image || '',
+      image: banner.image || '',
       active: banner.active,
     });
     setShowForm(true);
@@ -124,7 +125,7 @@ export const BannerManager: React.FC = () => {
       if (error) throw error;
       setSuccess('Banner eliminado exitosamente');
       fetchBanners();
-    } catch (err) {
+    } catch (_err) {
       setError('Error al eliminar banner');
     }
   };
@@ -181,10 +182,10 @@ export const BannerManager: React.FC = () => {
                 <TableCell>{banner.title}</TableCell>
                 <TableCell>{banner.content.substring(0, 50)}...</TableCell>
                 <TableCell>
-                  {(banner as any).image ? (
-                    <img 
-                      src={(banner as any).image} 
-                      alt="Banner" 
+                  {banner.image ? (
+                    <img
+                      src={banner.image}
+                      alt="Banner"
                       style={{ width: 50, height: 30, objectFit: 'cover', borderRadius: 4 }}
                     />
                   ) : (

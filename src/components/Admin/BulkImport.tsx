@@ -25,7 +25,7 @@ interface BulkImportProps {
 
 export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSuccess }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, string>[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -91,7 +91,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
         }
         
         // Filter out empty rows and validate
-        const validData = (results.data as any[]).filter(row => {
+        const validData = (results.data as Record<string, string>[]).filter(row => {
           // Check if row has at least some data
           return Object.values(row).some(value => value && String(value).trim() !== '');
         });
@@ -116,8 +116,8 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     });
   };
 
-  const processData = (rawData: any[]) => {
-    return rawData.map((row: any) => {
+  const processData = (rawData: Record<string, string>[]) => {
+    return rawData.map((row: Record<string, string>) => {
       if (type === 'game') {
         // Validate platform
         const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable', 'PlayStation Vita'];

@@ -38,7 +38,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 };
 
 export const AdminDashboard: React.FC = () => {
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {

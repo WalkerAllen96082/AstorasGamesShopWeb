@@ -70,7 +70,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
