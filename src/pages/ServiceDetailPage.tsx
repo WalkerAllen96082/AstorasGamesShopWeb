@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import {
   Box,
   Grid,
@@ -93,85 +94,94 @@ export const ServiceDetailPage: React.FC = () => {
   }
 
   return (
-    <Layout>
-      <Box sx={{ mb: 3 }}>
-        <IconButton onClick={() => navigate('/services')} sx={{ mb: 2 }}>
-          <BackIcon />
-        </IconButton>
-      </Box>
+    <>
+      <Helmet>
+        <title>{service?.name} - Astora's Games Shop</title>
+        <meta property="og:title" content={service?.name} />
+        <meta property="og:description" content={service?.description} />
+        <meta property="og:image" content={service?.cover || '/placeholder.jpg'} />
+        <meta property="og:type" content="product" />
+      </Helmet>
+      <Layout>
+        <Box sx={{ mb: 3 }}>
+          <IconButton onClick={() => navigate('/services')} sx={{ mb: 2 }}>
+            <BackIcon />
+          </IconButton>
+        </Box>
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={5}>
-          <Card>
-            <CardMedia
-              component="img"
-              height="500"
-              image={service.cover}
-              alt={service.name}
-              sx={{ objectFit: 'cover' }}
-            />
-          </Card>
-        </Grid>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={5}>
+            <Card>
+              <CardMedia
+                component="img"
+                height="500"
+                image={service.cover}
+                alt={service.name}
+                sx={{ objectFit: 'cover' }}
+              />
+            </Card>
+          </Grid>
 
-        <Grid item xs={12} md={7}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
-            {service.name}
-          </Typography>
-
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Duration
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {service.duration || 'N/A'}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Currency
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {service.currency}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-
-          <Typography variant="h6" gutterBottom>
-            Description
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
-            {service.description}
-          </Typography>
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography
-              variant="h4"
-              component="div"
-              sx={{
-                fontWeight: 700,
-                color: 'primary.main',
-              }}
-            >
-              {service.currency} ${service.price.toFixed(2)}
+          <Grid item xs={12} md={7}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+              {service.name}
             </Typography>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<AddIcon />}
-              onClick={handleAddToCart}
-              sx={{ px: 4, py: 1.5 }}
-            >
-              Add to Cart
-            </Button>
-          </Box>
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Duration
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {service.duration || 'N/A'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Currency
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {service.currency}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            <Typography variant="h6" gutterBottom>
+              Description
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
+              {service.description}
+            </Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{
+                  fontWeight: 700,
+                  color: 'primary.main',
+                }}
+              >
+                {service.currency} ${service.price.toFixed(2)}
+              </Typography>
+
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<AddIcon />}
+                onClick={handleAddToCart}
+                sx={{ px: 4, py: 1.5 }}
+              >
+                Add to Cart
+              </Button>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </Layout>
+      </Layout>
+    </>
   );
 };
