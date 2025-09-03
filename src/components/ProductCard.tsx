@@ -8,7 +8,7 @@ import {
   Chip,
   Button,
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+
 import { Game, Product, Service } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -110,7 +110,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
         </Typography>
 
         {type === 'game' && ('platform' in item || 'year' in item) && (
-          <Box sx={{ display: 'flex', gap: 1, mb: compact ? 0.3 : 0.8 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: compact ? 0.3 : 0.8 }}>
             {'platform' in item && (
               <Chip
                 label={(item as Game).platform}
@@ -167,7 +167,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           <Button
             size="small"
             variant="contained"
-            startIcon={<AddIcon />}
             onClick={handleAddToCart}
             sx={{
               minWidth: 'auto',
@@ -176,7 +175,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
              py: compact ? 0.2 : 0.4,
             }}
           >
-           {compact ? '+' : 'Add'}
+           ADD
           </Button>
         </Box>
       </CardContent>
