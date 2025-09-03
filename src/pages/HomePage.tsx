@@ -7,22 +7,23 @@ import {
 } from '@mui/material';
 import { ArrowUpward as ArrowUpwardIcon } from '@mui/icons-material';
 import { Layout } from '../components/Layout/Layout';
-import { GameCarousel } from '../components/GameCarousel';
+import { UniversalCarousel } from '../components/UniversalCarousel';
 import { Banner } from '../components/Banner';
-import { Game } from '../types';
+import { Game, Product, Service } from '../types';
 import { supabase } from '../lib/supabase';
 
 export const HomePage: React.FC = () => {
   const [mostViewed, setMostViewed] = useState<Game[]>([]);
-  const [newlyAdded, setNewlyAdded] = useState<Game[]>([]);
+  const [recentlyAddedServices, setRecentlyAddedServices] = useState<Service[]>([]);
+  const [recentlyAddedProducts, setRecentlyAddedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGames();
+    fetchData();
   }, []);
 
-  const fetchGames = async () => {
+  const fetchData = async () => {
     try {
       // Fetch most viewed games
       const { data: mostViewedData, error: mostViewedError } = await supabase
@@ -31,21 +32,29 @@ export const HomePage: React.FC = () => {
         .order('views', { ascending: false })
         .limit(15);
 
-      // Fetch newly added games
-      const { data: newlyAddedData, error: newlyAddedError } = await supabase
-        .from('games')
+      // Fetch recently added services
+      const { data: servicesData, error: servicesError } = await supabase
+        .from('services')
         .select('*')
-        .or('status.eq.newly_added,status.eq.updated')
+        .order('created_at', { ascending: false })
+        .limit(15);
+
+      // Fetch recently added products
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(15);
 
       if (mostViewedError) throw mostViewedError;
-      if (newlyAddedError) throw newlyAddedError;
+      if (servicesError) throw servicesError;
+      if (productsError) throw productsError;
 
       setMostViewed(mostViewedData || []);
-      setNewlyAdded(newlyAddedData || []);
+      setRecentlyAddedServices(servicesData || []);
+      setRecentlyAddedProducts(productsData || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch games');
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
@@ -86,8 +95,9 @@ export const HomePage: React.FC = () => {
         </Alert>
       )}
 
-      <GameCarousel title="🔥 Juegos Más Vistos" games={mostViewed.slice(0, 15)} loading={loading} />
-      <GameCarousel title="✨ Recién Agregados y Actualizados" games={newlyAdded.slice(0, 15)} loading={loading} />
+      <UniversalCarousel title="🔥 Juegos Más Vistos" items={mostViewed} type="game" loading={loading} />
+      <UniversalCarousel title="🛠️ Servicios Recientemente Añadidos" items={recentlyAddedServices} type="service" loading={loading} />
+      <UniversalCarousel title="📦 Productos Recientemente Añadidos" items={recentlyAddedProducts} type="product" loading={loading} />
 
       {/* Scroll to top button */}
       <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
