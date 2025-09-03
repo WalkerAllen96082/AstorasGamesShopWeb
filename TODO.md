@@ -1,11 +1,14 @@
-# TODO: Adjust Services and Products Pages for Mobile and Theme
+# TODO: General Adjustments
 
-## Tasks
-- [x] Update ServicesPage.tsx: Change Grid xs from 4 to 6 for 2 items per row on mobile
-- [x] Update ProductsPage.tsx: Change Grid xs from 4 to 6 for 2 items per row on mobile
-- [ ] Update ProductCard.tsx: Standardize card height to 280px for all types
-- [ ] Update ProductCard.tsx: Make image background theme-aware (white for light, #121212 for dark)
-- [ ] Update ProductCard.tsx: Increase description line clamp for services to 4
-- [ ] Update ProductCard.tsx: Ensure bottom section (price/button) is always at bottom
-- [ ] Test changes on mobile view
-- [ ] Verify theme switching affects image backgrounds
+## Task 1: Add dynamic meta tags for product and game detail pages
+- [x] Install React Helmet if not present
+- [x] Update ProductDetailPage.tsx to include dynamic meta tags (og:image, og:title, og:description)
+- [x] Update GameDetailPage.tsx to include dynamic meta tags (og:image, og:title, og:description)
+
+## Task 2: Translate cart order message to Spanish
+- [x] Update generateCartMessage function in CartPage.tsx to Spanish
+
+## Testing
+- [x] Test sharing product links to verify preview image
+- [x] Test sharing game links to verify preview image
+- [x] Test cart order message is in Spanish

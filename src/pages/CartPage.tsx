@@ -38,18 +38,21 @@ export const CartPage: React.FC = () => {
   };
 
   const generateCartMessage = () => {
-    let message = "🛒 *Astora's Games Shop - Order Details*\n\n";
-    
+    let message = "🛒 *Astora's Games Shop - Detalles del Pedido*\n\n";
+
     items.forEach((item: CartItem, index: number) => {
       message += `${index + 1}. *${item.item.name}*\n`;
-      message += `   Quantity: ${item.quantity}\n`;
-      message += `   Price: ${item.item.currency} $${item.item.price.toFixed(2)} each\n`;
+      if (item.type === 'game' && 'platform' in item.item) {
+        message += `   Plataforma: ${item.item.platform}\n`;
+      }
+      message += `   Cantidad: ${item.quantity}\n`;
+      message += `   Precio: ${item.item.currency} $${item.item.price.toFixed(2)} cada uno\n`;
       message += `   Subtotal: ${item.item.currency} $${(item.item.price * item.quantity).toFixed(2)}\n\n`;
     });
-    
+
     message += `💰 *Total: $${getTotalPrice().toFixed(2)}*\n\n`;
-    message += "Please confirm this order and provide payment details. Thank you! 🎮";
-    
+    message += "Por favor confirme este pedido y proporcione los detalles de pago. ¡Gracias! 🎮";
+
     return message;
   };
 

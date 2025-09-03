@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import {
   Box,
   Grid,
@@ -94,66 +95,75 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   return (
-    <Layout>
-      <Box sx={{ mb: 3 }}>
-        <IconButton onClick={() => navigate('/products')} sx={{ mb: 2 }}>
-          <BackIcon />
-        </IconButton>
-      </Box>
+    <>
+      <Helmet>
+        <title>{product?.name} - Astora's Games Shop</title>
+        <meta property="og:title" content={product?.name} />
+        <meta property="og:description" content={product?.description} />
+        <meta property="og:image" content={product?.image || '/placeholder.jpg'} />
+        <meta property="og:type" content="product" />
+      </Helmet>
+      <Layout>
+        <Box sx={{ mb: 3 }}>
+          <IconButton onClick={() => navigate('/products')} sx={{ mb: 2 }}>
+            <BackIcon />
+          </IconButton>
+        </Box>
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={5}>
-          <Card>
-            <CardMedia
-              component="img"
-              height="500"
-              image={product.image || '/placeholder.jpg'}
-              alt={product.name}
-              sx={{ objectFit: 'cover' }}
-            />
-          </Card>
-        </Grid>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={5}>
+            <Card>
+              <CardMedia
+                component="img"
+                height="500"
+                image={product.image || '/placeholder.jpg'}
+                alt={product.name}
+                sx={{ objectFit: 'cover' }}
+              />
+            </Card>
+          </Grid>
 
-        <Grid item xs={12} md={7}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
-            {product.name}
-          </Typography>
-
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <Chip label={product.category} color="secondary" />
-          </Box>
-
-          <Typography variant="h6" gutterBottom>
-            Description
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
-            {product.description}
-          </Typography>
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography
-              variant="h4"
-              component="div"
-              sx={{
-                fontWeight: 700,
-                color: 'primary.main',
-              }}
-            >
-              {product.currency} ${product.price.toFixed(2)}
+          <Grid item xs={12} md={7}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+              {product.name}
             </Typography>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<AddIcon />}
-              onClick={handleAddToCart}
-              sx={{ px: 4, py: 1.5 }}
-            >
-              Add to Cart
-            </Button>
-          </Box>
+            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              <Chip label={product.category} color="secondary" />
+            </Box>
+
+            <Typography variant="h6" gutterBottom>
+              Description
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
+              {product.description}
+            </Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{
+                  fontWeight: 700,
+                  color: 'primary.main',
+                }}
+              >
+                {product.currency} ${product.price.toFixed(2)}
+              </Typography>
+
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<AddIcon />}
+                onClick={handleAddToCart}
+                sx={{ px: 4, py: 1.5 }}
+              >
+                Add to Cart
+              </Button>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </Layout>
+      </Layout>
+    </>
   );
 };
