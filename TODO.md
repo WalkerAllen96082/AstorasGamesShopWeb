@@ -1,16 +1,11 @@
-# TODO: Update HomePage Carousels
+# TODO: Adjust Services and Products Pages for Mobile and Theme
 
 ## Tasks
-- [x] Create new UniversalCarousel component in src/components/UniversalCarousel.tsx
-- [x] Update HomePage.tsx to fetch services and products data
-- [x] Replace existing GameCarousel instances with three UniversalCarousel instances
-- [x] Test responsive behavior on desktop and mobile
-- [x] Verify arrow navigation and item display
-
-## Details
-- Remove two existing GameCarousel instances
-- Add three new carousels: Most Viewed Games, Recently Added Services, Recently Added Products
-- Desktop: 15 items in 3 groups of 5
-- Mobile: 15 items in 5 groups of 3
-- Arrows over first and last item
-- Maintain card styles, adjust for mobile
+- [x] Update ServicesPage.tsx: Change Grid xs from 4 to 6 for 2 items per row on mobile
+- [x] Update ProductsPage.tsx: Change Grid xs from 4 to 6 for 2 items per row on mobile
+- [ ] Update ProductCard.tsx: Standardize card height to 280px for all types
+- [ ] Update ProductCard.tsx: Make image background theme-aware (white for light, #121212 for dark)
+- [ ] Update ProductCard.tsx: Increase description line clamp for services to 4
+- [ ] Update ProductCard.tsx: Ensure bottom section (price/button) is always at bottom
+- [ ] Test changes on mobile view
+- [ ] Verify theme switching affects image backgrounds

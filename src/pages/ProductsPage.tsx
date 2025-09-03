@@ -158,7 +158,7 @@ export const ProductsPage: React.FC = () => {
       <Grid container spacing={2}>
         {loading
           ? Array.from({ length: 20 }, (_, index) => (
-              <Grid item xs={4} sm={3} md={2.4} lg={2} xl={1.5} key={index}>
+              <Grid item xs={6} sm={3} md={2.4} lg={2} xl={1.5} key={index}>
                 <Box>
                   <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={30} />
@@ -168,7 +168,7 @@ export const ProductsPage: React.FC = () => {
               </Grid>
             ))
           : paginatedProducts.map((product) => (
-              <Grid item xs={4} sm={3} md={2.4} lg={2} xl={1.5} key={product.id}>
+              <Grid item xs={6} sm={3} md={2.4} lg={2} xl={1.5} key={product.id}>
                 <ProductCard item={product} type="product" />
               </Grid>
             ))}

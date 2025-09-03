@@ -116,7 +116,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        minHeight: type === 'game' ? (compact ? 280 : 320) : (compact ? 280 : 350),
+        minHeight: compact ? 280 : 320,
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -135,16 +135,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
     >
       {getStatusWatermark()}
 
-      <Box sx={{ position: 'relative', backgroundColor: 'grey.200', display: 'flex', alignItems: 'center', justifyContent: 'center', height: type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5) }}>
+      <Box sx={{ position: 'relative', backgroundColor: theme => theme.palette.mode === 'dark' ? '#121212' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: compact ? 180 : 280 }}>
         <CardMedia
           component="img"
-          height={type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5)}
+          height={compact ? 180 : 280}
           image={getCover()}
           alt={item.name}
           sx={{
             objectFit: 'contain',
             width: '100%',
-            maxHeight: type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5),
+            maxHeight: compact ? 180 : 280,
           }}
         />
         {/* ADD button top right */}
@@ -240,7 +240,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
-              WebkitLineClamp: type === 'service' ? 3 : 2,
+              WebkitLineClamp: type === 'service' ? 4 : 2,
               WebkitBoxOrient: 'vertical',
               mt: 'auto',
             }}
