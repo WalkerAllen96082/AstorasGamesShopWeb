@@ -13,6 +13,7 @@ import { ProductsPage } from './pages/ProductsPage';
 import { ServicesPage } from './pages/ServicesPage';
 import { CartPage } from './pages/CartPage';
 import { AdminPage } from './pages/AdminPage';
+import { AboutPage } from './pages/AboutPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/games" element={<GamesPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/services" element={<ServicesPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/games/:id" element={<GameDetailPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/services/:id" element={<ServiceDetailPage />} />
