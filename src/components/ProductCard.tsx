@@ -7,9 +7,8 @@ import {
   Box,
   Chip,
   Button,
-  IconButton,
 } from '@mui/material';
-import { Add as AddIcon, Visibility as ViewIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { Game, Product, Service } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -110,19 +109,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           {item.name}
         </Typography>
 
-        {type === 'game' && 'platform' in item && (
-          <Chip
-            label={item.platform}
-            size={compact ? 'small' : 'small'}
-            color="secondary"
-           sx={{ mb: compact ? 0.3 : 0.8, fontSize: compact ? '0.6rem' : '0.7rem' }}
-          />
-        )}
-
-        {type === 'game' && 'year' in item && (
-          <Typography variant={compact ? 'caption' : 'body2'} color="text.secondary" sx={{ mb: compact ? 0.5 : 1 }}>
-            {compact ? item.year : `${item.year} • ${('size' in item) ? item.size : 'N/A'}`}
-          </Typography>
+        {type === 'game' && ('platform' in item || 'year' in item) && (
+          <Box sx={{ display: 'flex', gap: 1, mb: compact ? 0.3 : 0.8 }}>
+            {'platform' in item && (
+              <Chip
+                label={(item as Game).platform}
+                size={compact ? 'small' : 'small'}
+                color="secondary"
+                sx={{ fontSize: compact ? '0.6rem' : '0.7rem' }}
+              />
+            )}
+            {'year' in item && (
+              <Chip
+                label={(item as Game).year.toString()}
+                size={compact ? 'small' : 'small'}
+                sx={{ backgroundColor: 'gold', color: 'black', fontSize: compact ? '0.6rem' : '0.7rem' }}
+              />
+            )}
+          </Box>
         )}
 
         <Typography
@@ -143,37 +147,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
         </Typography>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-          <Typography
-           variant={compact ? 'caption' : 'h6'}
-            component="div"
-            sx={{ 
-              fontWeight: 700,
-              color: 'primary.main',
-             fontSize: compact ? '0.7rem' : '1rem',
-            }}
-          >
-            {item.currency} ${item.price.toFixed(2)}
-          </Typography>
-
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton size={compact ? 'small' : 'small'} onClick={handleViewDetails} color="primary">
-              <ViewIcon />
-            </IconButton>
-            <Button
-              size="small"
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddToCart}
-              sx={{ 
-                minWidth: 'auto', 
-               fontSize: compact ? '0.6rem' : '0.8rem',
-               px: compact ? 0.3 : 0.8,
-               py: compact ? 0.2 : 0.4,
+          <Box sx={{ mb: 1 }}>
+            <Typography
+             variant={compact ? 'caption' : 'h6'}
+              component="div"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main',
+               fontSize: compact ? '0.7rem' : '1rem',
               }}
             >
-             {compact ? '+' : 'Add'}
-            </Button>
+              ${item.price.toFixed(2)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: compact ? '0.6rem' : '0.7rem' }}>
+              CUP
+            </Typography>
           </Box>
+
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddToCart}
+            sx={{
+              minWidth: 'auto',
+             fontSize: compact ? '0.6rem' : '0.8rem',
+             px: compact ? 0.3 : 0.8,
+             py: compact ? 0.2 : 0.4,
+            }}
+          >
+           {compact ? '+' : 'Add'}
+          </Button>
         </Box>
       </CardContent>
     </Card>
