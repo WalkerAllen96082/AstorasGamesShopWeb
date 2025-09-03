@@ -135,16 +135,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
     >
       {getStatusWatermark()}
 
-      <Box sx={{ position: 'relative', backgroundColor: 'grey.200', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ position: 'relative', backgroundColor: 'grey.200', display: 'flex', alignItems: 'center', justifyContent: 'center', height: type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5) }}>
         <CardMedia
           component="img"
-          height={compact ? 180 : 280}
+          height={type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5)}
           image={getCover()}
           alt={item.name}
           sx={{
             objectFit: 'contain',
             width: '100%',
-            maxHeight: compact ? 180 : 280,
+            maxHeight: type === 'game' ? (compact ? 180 : 280) : (compact ? 210 : 262.5),
           }}
         />
         {/* ADD button top right */}
