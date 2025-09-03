@@ -73,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: type === 'game' ? (compact ? 280 : 360) : (compact ? 320 : 420),
+        height: type === 'game' ? (compact ? 280 : 320) : (compact ? 320 : 420),
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -91,19 +91,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       onClick={handleViewDetails}
     >
       {getStatusWatermark()}
-      
+
       <CardMedia
         component="img"
-       height={compact ? 180 : 220}
+       height={compact ? 180 : 280}
         image={getCover()}
         alt={item.name}
         sx={{
           objectFit: 'cover',
           width: '100%',
-         maxHeight: compact ? 180 : 220,
+         maxHeight: compact ? 180 : 280,
         }}
       />
-      
+
      <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
         <Typography gutterBottom variant={compact ? 'body2' : 'h6'} component="div" noWrap>
           {item.name}
@@ -116,12 +116,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-           WebkitLineClamp: type === 'service' ? (compact ? 3 : 4) : (compact ? 2 : 3),
+           WebkitLineClamp: type === 'service' ? (compact ? 3 : 4) : (compact ? 2 : (type === 'game' ? 1 : 3)),
             WebkitBoxOrient: 'vertical',
            mb: compact ? 0.8 : 1.5,
            fontSize: compact ? '0.65rem' : '0.875rem',
            lineHeight: compact ? 1.2 : 1.4,
-           maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : '4.5em'),
+           maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : (type === 'game' ? '2em' : '4.5em')),
           }}
         >
           {item.description}

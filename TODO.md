@@ -9,6 +9,11 @@
 - [x] Modify GameCarousel.tsx to use larger cards (compact=false) and adjust grid sizes if needed
 - [x] Ensure 15 games are displayed in 3 groups of 5
 
+## Feedback Adjustments
+- [x] HomePage: Make images larger, reduce space between cards, remove mini-description for more space
+- [x] GamesPage: Remove mini-description to show elements
+- [x] Both: Adjust cards symmetrically for aesthetics
+
 ## Testing
 - [ ] Test Games page to confirm elements are visible and image is reduced
 - [ ] Test Home page to confirm 15 games in 3 groups with larger cards
