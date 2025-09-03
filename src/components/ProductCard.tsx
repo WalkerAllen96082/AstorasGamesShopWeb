@@ -160,7 +160,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               ${item.price.toFixed(2)}
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: compact ? '0.6rem' : '0.7rem' }}>
-              CUP
+              {item.currency}
             </Typography>
           </Box>
 
