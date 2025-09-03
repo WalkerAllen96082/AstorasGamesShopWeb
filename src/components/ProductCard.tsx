@@ -73,13 +73,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: type === 'game' ? (compact ? 340 : 440 * 1.4) : (compact ? 320 : 420 * 1.4),
+        height: type === 'game' ? (compact ? 280 : 360) : (compact ? 320 : 420),
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         position: 'relative',
-       maxWidth: compact ? 160 : 200 * 1.4,
+       maxWidth: compact ? 160 : 200,
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: theme =>
@@ -94,13 +94,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       
       <CardMedia
         component="img"
-       height={compact ? 180 : 280 * 1.4}
+       height={compact ? 180 : 280}
         image={getCover()}
         alt={item.name}
         sx={{ 
           objectFit: 'cover',
           width: '100%',
-         maxHeight: compact ? 180 : 280 * 1.4,
+         maxHeight: compact ? 180 : 280,
         }}
       />
       
