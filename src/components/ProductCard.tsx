@@ -73,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: compact ? 320 : 420,
+        height: type === 'game' ? (compact ? 340 : 440) : (compact ? 320 : 420),
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
