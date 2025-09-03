@@ -73,8 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: '100%',
-        minHeight: compact ? 320 : 420,
+        height: compact ? 320 : 420,
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -105,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
         }}
       />
       
-     <CardContent sx={{ flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
+     <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
         <Typography gutterBottom variant={compact ? 'body2' : 'h6'} component="div" noWrap>
           {item.name}
         </Typography>
@@ -122,6 +121,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
            mb: compact ? 0.8 : 1.5,
            fontSize: compact ? '0.65rem' : '0.875rem',
            lineHeight: compact ? 1.2 : 1.4,
+           maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : '4.5em'),
           }}
         >
           {item.description}
