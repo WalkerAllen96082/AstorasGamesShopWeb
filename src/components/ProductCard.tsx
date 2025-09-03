@@ -116,7 +116,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: type === 'game' ? (compact ? 280 : 320) : (compact ? 320 : 420),
+        height: type === 'game' ? (compact ? 280 : 320) : (compact ? 280 : 350),
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -135,14 +135,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
     >
       {getStatusWatermark()}
 
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', backgroundColor: 'grey.200', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CardMedia
           component="img"
           height={compact ? 180 : 280}
           image={getCover()}
           alt={item.name}
           sx={{
-            objectFit: 'cover',
+            objectFit: 'contain',
             width: '100%',
             maxHeight: compact ? 180 : 280,
           }}
@@ -230,6 +230,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
             ${item.price.toFixed(2)}
           </Typography>
         </Box>
+        {(type === 'product' || type === 'service') && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              fontSize: compact ? '0.6rem' : '0.8rem',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+            }}
+          >
+            {item.description}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,19 +1,15 @@
-# TODO List for Game Cards and Carousels Update
+# TODO: Modificações nas Páginas de Produtos e Serviços
 
-## Games Page Changes
-- [x] Reduce image size in ProductCard.tsx for default mode to make space for year, platform, price, and add to cart elements
-- [x] Verify ProductCard is used with compact=false in GamesPage.tsx (already done)
+## Tarefas Pendentes
+- [x] Editar ProductCard.tsx para adicionar descrição breve abaixo do nome para produtos e serviços
+- [x] Ajustar altura vertical da carta para ser menos alta
+- [x] Centralizar imagem e adicionar preenchimento cinza se necessário
 
-## Home Page Changes
-- [x] Update HomePage.tsx to fetch 15 games instead of 8 for each carousel
-- [x] Modify GameCarousel.tsx to use larger cards (compact=false) and adjust grid sizes if needed
-- [x] Ensure 15 games are displayed in 3 groups of 5
+## Arquivos a serem editados
+- src/components/ProductCard.tsx
 
-## Feedback Adjustments
-- [x] HomePage: Make images larger, reduce space between cards, remove mini-description for more space
-- [x] GamesPage: Remove mini-description to show elements
-- [x] Both: Adjust cards symmetrically for aesthetics
-
-## Testing
-- [ ] Test Games page to confirm elements are visible and image is reduced
-- [ ] Test Home page to confirm 15 games in 3 groups with larger cards
+## Status
+- Análise completa dos arquivos relevantes
+- Plano aprovado pelo usuário
+- Mudanças implementadas com sucesso
+- Todas as modificações solicitadas foram aplicadas
