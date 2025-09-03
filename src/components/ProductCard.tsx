@@ -210,68 +210,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
       </Box>
 
       <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
-        <Typography gutterBottom component="div" noWrap sx={{ height: compact ? 20 : 28 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: compact ? 0.8 : 1.5 }}>
           <DynamicFontSizeText
             text={item.name}
             maxFontSize={compact ? 16 : 20}
             minFontSize={10}
-            style={{ fontWeight: 'bold' }}
+            style={{ fontWeight: 'bold', flex: 1, marginRight: '8px' }}
           />
-        </Typography>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}>
-          {type === 'game' && ('platform' in item || 'year' in item) && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {'platform' in item && (
-                <Chip
-                  label={(item as Game).platform}
-                  size={compact ? 'small' : 'small'}
-                  color="secondary"
-                  sx={{ fontSize: compact ? '0.6rem' : '0.7rem' }}
-                />
-              )}
-              {'year' in item && (
-                <Chip
-                  label={(item as Game).year.toString()}
-                  size={compact ? 'small' : 'small'}
-                  sx={{ backgroundColor: 'gold', color: 'black', fontSize: compact ? '0.6rem' : '0.7rem' }}
-                />
-              )}
-            </Box>
-          )}
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography
-                variant={compact ? 'caption' : 'h6'}
-                component="div"
-                sx={{
-                  fontWeight: 700,
-                  color: 'primary.main',
-                  fontSize: compact ? '0.7rem' : '1rem',
-                }}
-              >
-                ${item.price.toFixed(2)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: compact ? '0.6rem' : '0.7rem' }}>
-                {item.currency}
-              </Typography>
-            </Box>
-
-            <Button
-              size={compact ? 'small' : 'medium'}
-              variant="contained"
-              onClick={handleAddToCart}
-              sx={{
-                minWidth: 'auto',
-                fontSize: compact ? '0.8rem' : '1rem',
-                px: compact ? 0.5 : 1,
-                py: compact ? 0.3 : 0.5,
-              }}
-            >
-              ADD
-            </Button>
-          </Box>
+          <Typography
+            variant={compact ? 'caption' : 'h6'}
+            component="div"
+            sx={{
+              fontWeight: 700,
+              color: 'primary.main',
+              fontSize: compact ? '0.7rem' : '1rem',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ${item.price.toFixed(2)}
+          </Typography>
         </Box>
       </CardContent>
     </Card>
