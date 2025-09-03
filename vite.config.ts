@@ -15,7 +15,4 @@ export default defineConfig({
     include: ['prop-types'],
     exclude: ['lucide-react', '@mui/icons-material'],
   },
-  server: {
-    historyApiFallback: true,
-  },
 });
