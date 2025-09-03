@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -18,6 +18,49 @@ interface ProductCardProps {
   type: 'game' | 'product' | 'service';
   compact?: boolean;
 }
+
+const DynamicFontSizeText: React.FC<{ text: string; maxFontSize: number; minFontSize: number; style?: React.CSSProperties }> = ({
+  text,
+  maxFontSize,
+  minFontSize,
+  style,
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [fontSize, setFontSize] = useState(maxFontSize);
+
+  useEffect(() => {
+    const adjustFontSize = () => {
+      if (!containerRef.current || !textRef.current) return;
+      let currentFontSize = maxFontSize;
+      const containerWidth = containerRef.current.offsetWidth;
+      const containerHeight = containerRef.current.offsetHeight;
+
+      textRef.current.style.fontSize = `${currentFontSize}px`;
+
+      while (
+        (textRef.current.scrollWidth > containerWidth || textRef.current.scrollHeight > containerHeight) &&
+        currentFontSize > minFontSize
+      ) {
+        currentFontSize -= 1;
+        textRef.current.style.fontSize = `${currentFontSize}px`;
+      }
+      setFontSize(currentFontSize);
+    };
+
+    adjustFontSize();
+    window.addEventListener('resize', adjustFontSize);
+    return () => window.removeEventListener('resize', adjustFontSize);
+  }, [text, maxFontSize, minFontSize]);
+
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: '100%', ...style, overflow: 'hidden' }}>
+      <div ref={textRef} style={{ fontSize, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+        {text}
+      </div>
+    </div>
+  );
+};
 
 export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = false }) => {
   const { addToCart } = useCart();
@@ -79,7 +122,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
         cursor: 'pointer',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         position: 'relative',
-       maxWidth: compact ? 160 : 200,
+        maxWidth: compact ? 160 : 200,
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: theme =>
@@ -92,21 +135,88 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
     >
       {getStatusWatermark()}
 
-      <CardMedia
-        component="img"
-       height={compact ? 180 : 280}
-        image={getCover()}
-        alt={item.name}
-        sx={{
-          objectFit: 'cover',
-          width: '100%',
-         maxHeight: compact ? 180 : 280,
-        }}
-      />
+      <Box sx={{ position: 'relative' }}>
+        <CardMedia
+          component="img"
+          height={compact ? 180 : 280}
+          image={getCover()}
+          alt={item.name}
+          sx={{
+            objectFit: 'cover',
+            width: '100%',
+            maxHeight: compact ? 180 : 280,
+          }}
+        />
+        {/* ADD button top right */}
+        <Button
+          size={compact ? 'small' : 'medium'}
+          variant="contained"
+          onClick={handleAddToCart}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: 'gold',
+            color: 'black',
+            fontWeight: 'bold',
+            minWidth: 'auto',
+            fontSize: compact ? '0.7rem' : '1rem',
+            px: compact ? 0.5 : 1,
+            py: compact ? 0.3 : 0.5,
+            zIndex: 2,
+            '&:hover': {
+              backgroundColor: '#d4af37',
+            },
+          }}
+        >
+          ADD
+        </Button>
 
-     <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
-        <Typography gutterBottom variant={compact ? 'body2' : 'h6'} component="div" noWrap>
-          {item.name}
+        {/* Platform chip bottom left */}
+        {'platform' in item && (
+          <Chip
+            label={(item as Game).platform}
+            size={compact ? 'small' : 'medium'}
+            sx={{
+              position: 'absolute',
+              bottom: 8,
+              left: 8,
+              backgroundColor: 'gold',
+              color: 'black',
+              fontWeight: 'bold',
+              fontSize: compact ? '0.6rem' : '0.8rem',
+              zIndex: 2,
+            }}
+          />
+        )}
+
+        {/* Year chip bottom right */}
+        {'year' in item && (
+          <Chip
+            label={(item as Game).year.toString()}
+            size={compact ? 'small' : 'medium'}
+            sx={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              backgroundColor: 'gold',
+              color: 'black',
+              fontWeight: 'bold',
+              fontSize: compact ? '0.6rem' : '0.8rem',
+              zIndex: 2,
+            }}
+          />
+        )}
+      </Box>
+
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: compact ? 0.8 : 1.5 }}>
+        <Typography gutterBottom component="div" noWrap sx={{ height: compact ? 20 : 28 }}>
+          <DynamicFontSizeText
+            text={item.name}
+            maxFontSize={compact ? 16 : 20}
+            minFontSize={10}
+            style={{ fontWeight: 'bold' }}
+          />
         </Typography>
 
         <Typography
@@ -116,12 +226,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-           WebkitLineClamp: type === 'service' ? (compact ? 3 : 4) : (compact ? 2 : (type === 'game' ? 1 : 3)),
+            WebkitLineClamp: type === 'service' ? (compact ? 3 : 4) : (compact ? 2 : (type === 'game' ? 1 : 3)),
             WebkitBoxOrient: 'vertical',
-           mb: compact ? 0.8 : 1.5,
-           fontSize: compact ? '0.65rem' : '0.875rem',
-           lineHeight: compact ? 1.2 : 1.4,
-           maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : (type === 'game' ? '2em' : '4.5em')),
+            mb: compact ? 0.8 : 1.5,
+            fontSize: compact ? '0.65rem' : '0.875rem',
+            lineHeight: compact ? 1.2 : 1.4,
+            maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : (type === 'game' ? '2em' : '4.5em')),
           }}
         >
           {item.description}
@@ -151,12 +261,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
               <Typography
-               variant={compact ? 'caption' : 'h6'}
+                variant={compact ? 'caption' : 'h6'}
                 component="div"
                 sx={{
                   fontWeight: 700,
                   color: 'primary.main',
-                 fontSize: compact ? '0.7rem' : '1rem',
+                  fontSize: compact ? '0.7rem' : '1rem',
                 }}
               >
                 ${item.price.toFixed(2)}
@@ -172,12 +282,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               onClick={handleAddToCart}
               sx={{
                 minWidth: 'auto',
-               fontSize: compact ? '0.8rem' : '1rem',
-               px: compact ? 0.5 : 1,
-               py: compact ? 0.3 : 0.5,
+                fontSize: compact ? '0.8rem' : '1rem',
+                px: compact ? 0.5 : 1,
+                py: compact ? 0.3 : 0.5,
               }}
             >
-             ADD
+              ADD
             </Button>
           </Box>
         </Box>
