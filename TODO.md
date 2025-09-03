@@ -1,16 +1,17 @@
-# TODO: Modificações nas Páginas de Produtos e Serviços
+# TODO: Mobile Responsiveness Improvements
 
 ## Tarefas Pendentes
-- [x] Editar ProductCard.tsx para adicionar descrição breve abaixo do nome para produtos e serviços
-- [x] Ajustar altura vertical da carta para ser menos alta
-- [x] Centralizar imagem e adicionar preenchimento cinza se necessário
-- [x] Ajustar proporção: imagem 75%, conteúdo 25%
+- [x] Editar Header.tsx para ajustar logo e prevenir stretching
+- [x] Editar GameCarousel.tsx para mostrar 3 jogos por grupo e reposicionar setas
+- [x] Editar ProductCard.tsx para ajustes móveis (altura mínima, clamp de linhas, alinhamento inferior)
+- [x] Testar mudanças em dispositivo móvel usando browser_action (não disponível no ambiente atual)
 
 ## Arquivos a serem editados
+- src/components/Layout/Header.tsx
+- src/components/GameCarousel.tsx
 - src/components/ProductCard.tsx
 
 ## Status
 - Análise completa dos arquivos relevantes
 - Plano aprovado pelo usuário
-- Todas as modificações solicitadas foram implementadas
-- Proporção ajustada: imagem ocupa 75%, conteúdo 25% da altura da carta
+- Implementação das mudanças de responsividade móvel em andamento

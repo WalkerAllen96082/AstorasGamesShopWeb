@@ -21,7 +21,7 @@ interface GameCarouselProps {
 
 export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loading }) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = 3;
   const totalPages = Math.ceil(games.length / itemsPerPage);
 
   const handlePrevious = () => {
@@ -39,23 +39,46 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
   );
 
   return (
-    <Paper sx={{ p: 3, mb: 4 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          {title}
-        </Typography>
-        {games.length > itemsPerPage && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton onClick={handlePrevious} color="primary">
-              <ChevronLeftIcon />
-            </IconButton>
-            <IconButton onClick={handleNext} color="primary">
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
-        )}
-      </Box>
-      
+    <Paper sx={{ p: 3, mb: 4, position: 'relative' }}>
+      <Typography variant="h4" sx={{ fontWeight: 600, mb: 3 }}>
+        {title}
+      </Typography>
+
+      {games.length > itemsPerPage && (
+        <>
+          <IconButton
+            onClick={handlePrevious}
+            color="primary"
+            sx={{
+              position: 'absolute',
+              left: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.9)' },
+            }}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton
+            onClick={handleNext}
+            color="primary"
+            sx={{
+              position: 'absolute',
+              right: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.9)' },
+            }}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </>
+      )}
+
       <Grid container spacing={1}>
         {loading
           ? Array.from({ length: 5 }, (_, index) => (

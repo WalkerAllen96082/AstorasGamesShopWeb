@@ -116,7 +116,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
   return (
     <Card
       sx={{
-        height: type === 'game' ? (compact ? 280 : 320) : (compact ? 280 : 350),
+        minHeight: type === 'game' ? (compact ? 280 : 320) : (compact ? 280 : 350),
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -240,8 +240,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: type === 'service' ? 3 : 2,
               WebkitBoxOrient: 'vertical',
+              mt: 'auto',
             }}
           >
             {item.description}

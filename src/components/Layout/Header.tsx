@@ -80,6 +80,7 @@ export const Header: React.FC = () => {
               width: isMobile ? 32 : 24,
               height: isMobile ? 32 : 24,
               mr: isMobile ? 0 : 1,
+              objectFit: 'contain',
             }}
           />
           {!isMobile && (
