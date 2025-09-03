@@ -219,24 +219,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           />
         </Typography>
 
-        <Typography
-          variant={compact ? 'caption' : 'body2'}
-          color="text.secondary"
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: type === 'service' ? (compact ? 3 : 4) : (compact ? 2 : (type === 'game' ? 1 : 3)),
-            WebkitBoxOrient: 'vertical',
-            mb: compact ? 0.8 : 1.5,
-            fontSize: compact ? '0.65rem' : '0.875rem',
-            lineHeight: compact ? 1.2 : 1.4,
-            maxHeight: type === 'service' ? (compact ? '4.5em' : '6em') : (compact ? '3em' : (type === 'game' ? '2em' : '4.5em')),
-          }}
-        >
-          {item.description}
-        </Typography>
-
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}>
           {type === 'game' && ('platform' in item || 'year' in item) && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
