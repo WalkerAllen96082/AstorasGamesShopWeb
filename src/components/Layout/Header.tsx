@@ -72,11 +72,16 @@ export const Header: React.FC = () => {
 
         {/* Logo and Title */}
         <Box display="flex" alignItems="center" onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
-          <GamesIcon sx={{ 
-            mr: isMobile ? 0 : 1, 
-            color: isDarkMode ? 'primary.main' : 'white',
-            fontSize: isMobile ? 32 : 24
-          }} />
+          <Box
+            component="img"
+            src="/icon.png"
+            alt="Logo"
+            sx={{
+              width: isMobile ? 32 : 24,
+              height: isMobile ? 32 : 24,
+              mr: isMobile ? 0 : 1,
+            }}
+          />
           {!isMobile && (
             <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
               Tienda de Juegos de Astora
