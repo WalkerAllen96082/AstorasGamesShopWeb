@@ -165,14 +165,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item, type, compact = 
           </Box>
 
           <Button
-            size="small"
+            size={compact ? 'small' : 'medium'}
             variant="contained"
             onClick={handleAddToCart}
             sx={{
               minWidth: 'auto',
-             fontSize: compact ? '0.6rem' : '0.8rem',
-             px: compact ? 0.3 : 0.8,
-             py: compact ? 0.2 : 0.4,
+             fontSize: compact ? '0.8rem' : '1rem',
+             px: compact ? 0.5 : 1,
+             py: compact ? 0.3 : 0.5,
             }}
           >
            ADD
