@@ -302,7 +302,7 @@ export const GamesPage: React.FC = () => {
             ))
           : paginatedGames.map((game) => (
               <Grid item xs={6} sm={4} md={3} lg={2.4} xl={2} key={game.id}>
-                <ProductCard item={game} type="game" />
+                <ProductCard item={game} type="game" compact={false} />
               </Grid>
             ))}
       </Grid>

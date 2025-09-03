@@ -1,14 +1,14 @@
-# TODO - Modificaciones a la Página Principal
+# TODO List for Game Cards and Carousels Update
 
-## Tareas Pendientes
-- [x] Aumentar tamaño de tarjetas en 40% para vista desktop en ProductCard.tsx
-- [x] Modificar GameCarousel.tsx para mostrar 5 juegos por página (en lugar de 8)
-- [x] Limitar total de juegos mostrados a 15 por carrusel en HomePage.tsx
-- [x] Cambiar título de la ventana en index.html
-- [ ] Verificar responsividad y funcionamiento de carruseles
+## Games Page Changes
+- [x] Reduce image size in ProductCard.tsx for default mode to make space for year, platform, price, and add to cart elements
+- [x] Verify ProductCard is used with compact=false in GamesPage.tsx (already done)
 
-## Archivos a Modificar
-- src/components/ProductCard.tsx
-- src/components/GameCarousel.tsx
-- src/pages/HomePage.tsx
-- index.html
+## Home Page Changes
+- [x] Update HomePage.tsx to fetch 15 games instead of 8 for each carousel
+- [x] Modify GameCarousel.tsx to use larger cards (compact=false) and adjust grid sizes if needed
+- [x] Ensure 15 games are displayed in 3 groups of 5
+
+## Testing
+- [ ] Test Games page to confirm elements are visible and image is reduced
+- [ ] Test Home page to confirm 15 games in 3 groups with larger cards

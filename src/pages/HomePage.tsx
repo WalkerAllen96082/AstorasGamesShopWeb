@@ -29,7 +29,7 @@ export const HomePage: React.FC = () => {
         .from('games')
         .select('*')
         .order('views', { ascending: false })
-        .limit(8);
+        .limit(15);
 
       // Fetch newly added games
       const { data: newlyAddedData, error: newlyAddedError } = await supabase
@@ -37,7 +37,7 @@ export const HomePage: React.FC = () => {
         .select('*')
         .or('status.eq.newly_added,status.eq.updated')
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(15);
 
       if (mostViewedError) throw mostViewedError;
       if (newlyAddedError) throw newlyAddedError;

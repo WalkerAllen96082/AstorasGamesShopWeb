@@ -32,6 +32,7 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
     setCurrentIndex((prev) => (prev === totalPages - 1 ? 0 : prev + 1));
   };
 
+  // Show 3 groups of 5 games each (total 15)
   const currentGames = games.slice(
     currentIndex * itemsPerPage,
     currentIndex * itemsPerPage + itemsPerPage
@@ -60,15 +61,15 @@ export const GameCarousel: React.FC<GameCarouselProps> = ({ title, games, loadin
           ? Array.from({ length: 5 }, (_, index) => (
               <Grid item xs={12} sm={6} md={4} lg={2.4} xl={2.4} key={index}>
                 <Box>
-                  <Box sx={{ height: 200, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
-                  <Box sx={{ height: 20, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
-                  <Box sx={{ height: 15, backgroundColor: 'grey.300', width: '60%', borderRadius: 1 }} />
+                  <Box sx={{ height: 280, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
+                  <Box sx={{ height: 30, backgroundColor: 'grey.300', mb: 1, borderRadius: 1 }} />
+                  <Box sx={{ height: 20, backgroundColor: 'grey.300', width: '60%', borderRadius: 1 }} />
                 </Box>
               </Grid>
             ))
           : currentGames.map((game) => (
               <Grid item xs={12} sm={6} md={4} lg={2.4} xl={2.4} key={game.id}>
-                <ProductCard item={game} type="game" compact={true} />
+                <ProductCard item={game} type="game" compact={false} />
               </Grid>
             ))}
       </Grid>
