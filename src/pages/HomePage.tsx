@@ -86,8 +86,8 @@ export const HomePage: React.FC = () => {
         </Alert>
       )}
 
-      <GameCarousel title="🔥 Juegos Más Vistos" games={mostViewed} loading={loading} />
-      <GameCarousel title="✨ Recién Agregados y Actualizados" games={newlyAdded} loading={loading} />
+      <GameCarousel title="🔥 Juegos Más Vistos" games={mostViewed.slice(0, 15)} loading={loading} />
+      <GameCarousel title="✨ Recién Agregados y Actualizados" games={newlyAdded.slice(0, 15)} loading={loading} />
 
       {/* Scroll to top button */}
       <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
