@@ -94,6 +94,9 @@ export const ProductDetailPage: React.FC = () => {
     );
   }
 
+  console.log('Product image:', product?.image);
+  console.log('OG image URL:', product?.image ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}` : 'https://webshopastoras.netlify.app/placeholder.jpg');
+
   return (
     <>
       <Helmet>
