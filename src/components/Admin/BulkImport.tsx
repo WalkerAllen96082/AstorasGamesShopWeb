@@ -28,41 +28,56 @@ const MAX_DELAY = 15000; // Reduced to 15 seconds maximum
 const translateWithLibre = async (text: string): Promise<string | null> => {
   try {
     console.log('🔄 Attempting LibreTranslate API call...');
-    const response = await fetch('https://libretranslate.de/translate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        q: text,
-        source: 'en',
-        target: 'es',
-        format: 'text'
-      })
-    });
+    // Try multiple LibreTranslate instances that support CORS
+    const endpoints = [
+      'https://libretranslate.com/translate',
+      'https://translate.astian.org/translate',
+      'https://translate.mentality.rip/translate'
+    ];
 
-    console.log('📊 LibreTranslate response status:', response.status);
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`🎯 Trying endpoint: ${endpoint}`);
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            q: text,
+            source: 'en',
+            target: 'es',
+            format: 'text'
+          })
+        });
 
-    if (response.ok) {
-      const data = await response.json();
-      const translatedText = data.translatedText;
-      console.log('📝 LibreTranslate raw response:', data);
-      if (translatedText && translatedText !== text) {
-        console.log('✅ Translated (LibreTranslate):', translatedText);
-        return translatedText;
-      } else {
-        console.log('⚠️ LibreTranslate returned same text or empty');
+        console.log(`📊 ${endpoint} response status:`, response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          const translatedText = data.translatedText;
+          console.log('📝 LibreTranslate raw response:', data);
+          if (translatedText && translatedText !== text) {
+            console.log('✅ Translated (LibreTranslate):', translatedText);
+            return translatedText;
+          } else {
+            console.log('⚠️ LibreTranslate returned same text or empty');
+          }
+        } else {
+          console.log(`❌ ${endpoint} failed with status:`, response.status);
+        }
+      } catch (endpointError) {
+        console.log(`💥 ${endpoint} failed:`, endpointError);
+        continue; // Try next endpoint
       }
-    } else {
-      console.log('❌ LibreTranslate failed with status:', response.status);
-      const errorText = await response.text();
-      console.log('❌ LibreTranslate error response:', errorText);
     }
+
+    console.log('❌ All LibreTranslate endpoints failed');
+    return null;
   } catch (error) {
     console.log('💥 LibreTranslate error:', error);
+    return null;
   }
-
-  return null;
 };
 
 // Translation function with LibreTranslate as primary, fallback to MyMemory and Lingva
