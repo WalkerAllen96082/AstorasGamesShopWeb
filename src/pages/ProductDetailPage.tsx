@@ -100,8 +100,27 @@ export const ProductDetailPage: React.FC = () => {
         <title>{product?.name} - Astora's Games Shop</title>
         <meta property="og:title" content={product?.name} />
         <meta property="og:description" content={product?.description} />
-        <meta property="og:image" content={product?.image || '/placeholder.jpg'} />
+        <meta
+          property="og:image"
+          content={
+            product?.image
+              ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+              : 'https://webshopastoras.netlify.app/placeholder.jpg'
+          }
+        />
         <meta property="og:type" content="product" />
+        {/* Twitter Card meta tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product?.name} />
+        <meta name="twitter:description" content={product?.description} />
+        <meta
+          name="twitter:image"
+          content={
+            product?.image
+              ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+              : 'https://webshopastoras.netlify.app/placeholder.jpg'
+          }
+        />
       </Helmet>
       <Layout>
         <Box sx={{ mb: 3 }}>
@@ -116,7 +135,11 @@ export const ProductDetailPage: React.FC = () => {
               <CardMedia
                 component="img"
                 height="500"
-                image={product.image || '/placeholder.jpg'}
+            image={
+              product?.image
+                ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+                : 'https://webshopastoras.netlify.app/placeholder.jpg'
+            }
                 alt={product.name}
                 sx={{ objectFit: 'cover' }}
               />
