@@ -17,44 +17,34 @@ import { Upload as UploadIcon, Download as DownloadIcon, Cancel as CancelIcon } 
 import Papa from 'papaparse';
 import { supabase } from '../../lib/supabase';
 
-const LIBRE_TRANSLATE_URL = 'https://libretranslate.de';
-
-const detectLanguage = async (text: string): Promise<string> => {
-  try {
-    const response = await fetch(`${LIBRE_TRANSLATE_URL}/detect`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ q: text }),
-    });
-    const data = await response.json();
-    return data[0]?.language || 'unknown';
-  } catch (error) {
-    console.error('Language detection error:', error);
-    return 'unknown';
-  }
-};
-
-const translateText = async (text: string, sourceLang: string, targetLang: string): Promise<string> => {
-  if (sourceLang === targetLang) return text;
+// Simple translation function using MyMemory API (more CORS-friendly)
+const translateText = async (text: string): Promise<string> => {
+  if (!text.trim()) return text;
 
   try {
-    const response = await fetch(`${LIBRE_TRANSLATE_URL}/translate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        q: text,
-        source: sourceLang,
-        target: targetLang,
-      }),
+    // Use MyMemory translation API which is more permissive with CORS
+    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|es`, {
+      method: 'GET',
     });
+
+    if (!response.ok) {
+      throw new Error('Translation API error');
+    }
+
     const data = await response.json();
-    return data.translatedText || text;
+    const translatedText = data.responseData?.translatedText;
+
+    if (translatedText && translatedText !== text) {
+      console.log('Original:', text);
+      console.log('Translated:', translatedText);
+      return translatedText;
+    } else {
+      console.log('Translation failed or returned same text, keeping original');
+      return text;
+    }
   } catch (error) {
     console.error('Translation error:', error);
+    console.log('Keeping original text due to translation failure');
     return text; // Return original text if translation fails
   }
 };
@@ -163,18 +153,11 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     for (const row of rawData) {
       let description = row.description || '';
 
-      // Detect language and translate if English
+      // Attempt to translate description (assumes English input, translates to Spanish)
       if (description.trim()) {
         console.log('Original description:', description);
-        const detectedLang = await detectLanguage(description);
-        console.log('Detected language:', detectedLang);
-        if (detectedLang === 'en') {
-          const translated = await translateText(description, 'en', 'es');
-          console.log('Translated description:', translated);
-          description = translated;
-        } else {
-          console.log('Not English, keeping original');
-        }
+        const translated = await translateText(description);
+        description = translated;
       }
 
       const processedRow = processRow(row, description);
