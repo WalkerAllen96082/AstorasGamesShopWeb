@@ -1,14 +1,14 @@
-# TODO: General Adjustments
+# TODO List for Product Edit Feature Implementation
 
-## Task 1: Add dynamic meta tags for product and game detail pages
-- [x] Install React Helmet if not present
-- [x] Update ProductDetailPage.tsx to include dynamic meta tags (og:image, og:title, og:description)
-- [x] Update GameDetailPage.tsx to include dynamic meta tags (og:image, og:title, og:description)
+## Completed
+- Updated `src/components/Admin/ProductForm.tsx` to support editing existing products, games, and services.
+  - Added `edit` and `initialData` props.
+  - On submit, updates existing record if `edit` is true, otherwise inserts new record.
+  - Form UI updates to reflect edit mode (title, button text, success message).
+- Fixed `src/components/Admin/ProductList.tsx` to correctly handle onEdit callback for viewing/editing products.
+- Verified `src/components/Admin/AdminDashboard.tsx` integrates edit mode with ProductForm and ProductList components.
 
-## Task 2: Translate cart order message to Spanish
-- [x] Update generateCartMessage function in CartPage.tsx to Spanish
-
-## Testing
-- [x] Test sharing product links to verify preview image
-- [x] Test sharing game links to verify preview image
-- [x] Test cart order message is in Spanish
+## Next Steps
+- Test the admin dashboard UI to ensure editing existing products works as expected.
+- Fix any bugs or UI issues found during testing.
+- Optionally, add validation or user feedback improvements.

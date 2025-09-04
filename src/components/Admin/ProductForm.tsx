@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Paper,
   Typography,
@@ -41,9 +41,11 @@ interface ProductFormProps {
   type: 'game' | 'product' | 'service';
   onCancel: () => void;
   onSuccess: () => void;
+  edit?: boolean;
+  initialData?: any;
 }
 
-export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSuccess }) => {
+export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSuccess, edit = false, initialData }) => {
   const [formData, setFormData] = useState({
     cover: '',
     name: '',
@@ -69,6 +71,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (edit && initialData) {
+      setFormData({
+        cover: initialData.cover || initialData.image || '',
+        name: initialData.name || '',
+        size: initialData.size || '',
+        year: initialData.year || new Date().getFullYear(),
+        platform: initialData.platform || platforms[0],
+        price: initialData.price || 0,
+        currency: initialData.currency || 'USD',
+        description: initialData.description || '',
+        status: initialData.status || null,
+        category: initialData.category || 'electronics',
+        duration: initialData.duration || '',
+      });
+      setStatusChecked({
+        newly_added: initialData.status === 'newly_added',
+        updated: initialData.status === 'updated',
+      });
+    }
+  }, [edit, initialData]);
 
   const handleInputChange = (field: string, value: string | number | boolean | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -146,9 +170,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
         };
       }
 
-      const { error } = await supabase
-        .from(tableName)
-        .insert([data]);
+      const { error } = edit && initialData
+        ? await supabase
+            .from(tableName)
+            .update(data)
+            .eq('id', initialData.id)
+        : await supabase
+            .from(tableName)
+            .insert([data]);
 
       if (error) throw error;
 
@@ -167,7 +196,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
     return (
       <Paper sx={{ p: 3 }}>
         <Alert severity="success">
-          {type.charAt(0).toUpperCase() + type.slice(1)} added successfully!
+          {type.charAt(0).toUpperCase() + type.slice(1)} {edit ? 'updated' : 'added'} successfully!
         </Alert>
       </Paper>
     );
@@ -176,7 +205,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
   return (
     <Paper sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Add New {type.charAt(0).toUpperCase() + type.slice(1)}
+        {edit ? 'Edit' : 'Add New'} {type.charAt(0).toUpperCase() + type.slice(1)}
       </Typography>
 
       {error && (
@@ -426,7 +455,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ type, onCancel, onSucc
                 startIcon={<SaveIcon />}
                 disabled={loading}
               >
-                {loading ? 'Saving...' : 'Save Product'}
+                {loading ? 'Saving...' : edit ? 'Update Product' : 'Save Product'}
               </Button>
             </Box>
           </Grid>

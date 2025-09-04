@@ -107,7 +107,7 @@ export const ProductDetailPage: React.FC = () => {
           property="og:image"
           content={
             product?.image
-              ? (product.image.startsWith('http') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
+              ? (product.image.startsWith('http') || product.image.startsWith('data:') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
               : 'https://webshopastoras.netlify.app/placeholder.jpg'
           }
         />
@@ -120,7 +120,7 @@ export const ProductDetailPage: React.FC = () => {
           name="twitter:image"
           content={
             product?.image
-              ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+              ? (product.image.startsWith('http') || product.image.startsWith('data:') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
               : 'https://webshopastoras.netlify.app/placeholder.jpg'
           }
         />
@@ -132,40 +132,40 @@ export const ProductDetailPage: React.FC = () => {
           </IconButton>
         </Box>
 
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={5}>
-            <Card>
-              <CardMedia
-                component="img"
-                height="500"
+        <Card sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, width: '100%', minHeight: '70vh' }}>
+          <CardMedia
+            component="img"
+            sx={{
+              width: { xs: '100%', md: '50%' },
+              height: { xs: 300, md: 'auto' },
+              objectFit: 'cover'
+            }}
             image={
               product?.image
-                ? (product.image.startsWith('http') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
+                ? (product.image.startsWith('http') || product.image.startsWith('data:') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
                 : 'https://webshopastoras.netlify.app/placeholder.jpg'
             }
-                alt={product.name}
-                sx={{ objectFit: 'cover' }}
-              />
-            </Card>
-          </Grid>
+            alt={product.name}
+          />
+          <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 4 }}>
+            <Box>
+              <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+                {product.name}
+              </Typography>
 
-          <Grid item xs={12} md={7}>
-            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
-              {product.name}
-            </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Chip label={product.category} color="secondary" />
+              </Box>
 
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <Chip label={product.category} color="secondary" />
+              <Typography variant="h6" gutterBottom>
+                Description
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
+                {product.description}
+              </Typography>
             </Box>
 
-            <Typography variant="h6" gutterBottom>
-              Description
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
-              {product.description}
-            </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
               <Typography
                 variant="h4"
                 component="div"
@@ -187,8 +187,8 @@ export const ProductDetailPage: React.FC = () => {
                 Add to Cart
               </Button>
             </Box>
-          </Grid>
-        </Grid>
+          </CardContent>
+        </Card>
       </Layout>
     </>
   );

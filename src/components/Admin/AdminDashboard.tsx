@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -21,7 +21,9 @@ import { Layout } from '../Layout/Layout';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProductManager } from './ProductManager';
 import { ProductList } from './ProductList';
+import { ProductForm } from './ProductForm';
 import { BannerManager } from './BannerManager';
+import { supabase } from '../../lib/supabase';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -40,6 +42,29 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 export const AdminDashboard: React.FC = () => {
   const { signOut } = useAuth();
   const [tabValue, setTabValue] = useState(0);
+  const [totalGames, setTotalGames] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalServices, setTotalServices] = useState(0);
+  const [editMode, setEditMode] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [gamesRes, productsRes, servicesRes] = await Promise.all([
+          supabase.from('games').select('*', { count: 'exact', head: true }),
+          supabase.from('products').select('*', { count: 'exact', head: true }),
+          supabase.from('services').select('*', { count: 'exact', head: true }),
+        ]);
+        setTotalGames(gamesRes.count || 0);
+        setTotalProducts(productsRes.count || 0);
+        setTotalServices(servicesRes.count || 0);
+      } catch (error) {
+        console.error('Error fetching counts:', error);
+      }
+    };
+    fetchCounts();
+  }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -47,6 +72,21 @@ export const AdminDashboard: React.FC = () => {
 
   const handleLogout = async () => {
     await signOut();
+  };
+
+  const handleEdit = (item: any) => {
+    setEditItem(item);
+    setEditMode(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditMode(false);
+    setEditItem(null);
+  };
+
+  const handleEditSuccess = () => {
+    setEditMode(false);
+    setEditItem(null);
   };
 
   return (
@@ -84,7 +124,7 @@ export const AdminDashboard: React.FC = () => {
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <GamesIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                0
+                {totalGames}
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 Total Games
@@ -95,7 +135,7 @@ export const AdminDashboard: React.FC = () => {
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <ProductsIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                0
+                {totalProducts}
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 Total Products
@@ -106,7 +146,7 @@ export const AdminDashboard: React.FC = () => {
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <ServicesIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                0
+                {totalServices}
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 Total Services
@@ -121,7 +161,17 @@ export const AdminDashboard: React.FC = () => {
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        <ProductList />
+        {editMode ? (
+          <ProductForm
+            type={editItem.type}
+            onCancel={handleEditCancel}
+            onSuccess={handleEditSuccess}
+            edit={true}
+            initialData={editItem}
+          />
+        ) : (
+          <ProductList onEdit={handleEdit} />
+        )}
       </TabPanel>
 
       <TabPanel value={tabValue} index={3}>

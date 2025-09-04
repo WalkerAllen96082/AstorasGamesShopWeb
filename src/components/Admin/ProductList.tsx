@@ -35,7 +35,11 @@ import { supabase } from '../../lib/supabase';
 import { Game, Product, Service } from '../../types';
 import { BulkActions } from './BulkActions';
 
-export const ProductList: React.FC = () => {
+interface ProductListProps {
+  onEdit?: (item: any) => void;
+}
+
+export const ProductList: React.FC<ProductListProps> = ({ onEdit }) => {
   const [products, setProducts] = useState<(Game | Product | Service)[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -271,10 +275,10 @@ export const ProductList: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton size="small" color="primary">
+                      <IconButton size="small" color="primary" onClick={() => onEdit && onEdit(product)}>
                         <ViewIcon />
                       </IconButton>
-                      <IconButton size="small" color="secondary">
+                      <IconButton size="small" color="secondary" onClick={() => onEdit && onEdit(product)}>
                         <EditIcon />
                       </IconButton>
                       <IconButton
