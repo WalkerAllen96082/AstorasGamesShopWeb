@@ -166,9 +166,15 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
 
       // Detect language and translate if English
       if (description.trim()) {
+        console.log('Original description:', description);
         const detectedLang = await detectLanguage(description);
+        console.log('Detected language:', detectedLang);
         if (detectedLang === 'en') {
-          description = await translateText(description, 'en', 'es');
+          const translated = await translateText(description, 'en', 'es');
+          console.log('Translated description:', translated);
+          description = translated;
+        } else {
+          console.log('Not English, keeping original');
         }
       }
 
