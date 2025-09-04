@@ -20,14 +20,15 @@ import { supabase } from '../../lib/supabase';
 // Global rate limiting state
 let lastRequestTime = 0;
 let consecutiveFailures = 0;
-const MAX_CONSECUTIVE_FAILURES = 3; // Reduced to be more aggressive
-const BASE_DELAY = 30000; // Increased to 30 seconds base delay
-const MAX_DELAY = 60000; // Maximum 60 second delay
+const MAX_CONSECUTIVE_FAILURES = 3;
+const BASE_DELAY = 5000; // Reduced to 5 seconds for faster imports
+const MAX_DELAY = 15000; // Reduced to 15 seconds maximum
 
 // LibreTranslate API function (free, open source, better quality than Lingva)
 const translateWithLibre = async (text: string): Promise<string | null> => {
   try {
-    const response = await fetch('https://translate.argosopentech.com/translate', {
+    console.log('🔄 Attempting LibreTranslate API call...');
+    const response = await fetch('https://libretranslate.de/translate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -40,16 +41,25 @@ const translateWithLibre = async (text: string): Promise<string | null> => {
       })
     });
 
+    console.log('📊 LibreTranslate response status:', response.status);
+
     if (response.ok) {
       const data = await response.json();
       const translatedText = data.translatedText;
+      console.log('📝 LibreTranslate raw response:', data);
       if (translatedText && translatedText !== text) {
-        console.log('Translated (LibreTranslate):', translatedText);
+        console.log('✅ Translated (LibreTranslate):', translatedText);
         return translatedText;
+      } else {
+        console.log('⚠️ LibreTranslate returned same text or empty');
       }
+    } else {
+      console.log('❌ LibreTranslate failed with status:', response.status);
+      const errorText = await response.text();
+      console.log('❌ LibreTranslate error response:', errorText);
     }
   } catch (error) {
-    console.log('LibreTranslate failed:', error);
+    console.log('💥 LibreTranslate error:', error);
   }
 
   return null;
@@ -69,7 +79,7 @@ const translateText = async (text: string): Promise<string> => {
   const actualDelay = Math.max(0, requiredDelay - timeSinceLastRequest);
 
   if (actualDelay > 0) {
-    console.log(`Rate limiting: waiting ${actualDelay}ms before next request...`);
+    console.log(`⏳ Rate limiting: waiting ${actualDelay}ms before next request...`);
     await new Promise(resolve => setTimeout(resolve, actualDelay));
   }
 
@@ -77,7 +87,7 @@ const translateText = async (text: string): Promise<string> => {
     lastRequestTime = Date.now();
 
     // Try LibreTranslate first (better quality than Lingva)
-    console.log('Trying LibreTranslate API...');
+    console.log('🎯 Trying LibreTranslate API...');
     const libreResult = await translateWithLibre(truncatedText);
     if (libreResult !== null) {
       consecutiveFailures = 0; // Reset on success
@@ -85,7 +95,7 @@ const translateText = async (text: string): Promise<string> => {
     }
 
     // Fallback to MyMemory (good quality but rate limited)
-    console.log('Trying MyMemory Translate API...');
+    console.log('🔄 Trying MyMemory Translate API...');
     try {
       const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
         method: 'GET',
@@ -93,24 +103,24 @@ const translateText = async (text: string): Promise<string> => {
 
       if (response.status === 429) {
         consecutiveFailures++;
-        console.log(`MyMemory rate limited (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}), trying Lingva...`);
+        console.log(`🚫 MyMemory rate limited (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}), trying Lingva...`);
       } else if (response.ok) {
         const data = await response.json();
         const translatedText = data.responseData?.translatedText;
 
         if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
-          console.log('Original:', truncatedText);
-          console.log('Translated (MyMemory):', translatedText);
+          console.log('📝 Original:', truncatedText);
+          console.log('✅ Translated (MyMemory):', translatedText);
           consecutiveFailures = 0; // Reset on success
           return translatedText;
         }
       }
     } catch (mymemoryError) {
-      console.log('MyMemory failed, trying Lingva...');
+      console.log('💥 MyMemory failed, trying Lingva...');
     }
 
     // Final fallback to Lingva (works but lower quality)
-    console.log('Trying Lingva Translate API...');
+    console.log('🎯 Trying Lingva Translate API...');
     try {
       const lingvaResponse = await fetch(`https://lingva.ml/api/v1/en/es/${encodeURIComponent(truncatedText)}`, {
         method: 'GET',
@@ -121,24 +131,24 @@ const translateText = async (text: string): Promise<string> => {
         const lingvaTranslated = lingvaData.translation;
 
         if (lingvaTranslated && lingvaTranslated !== truncatedText) {
-          console.log('Original:', truncatedText);
-          console.log('Translated (Lingva):', lingvaTranslated);
+          console.log('📝 Original:', truncatedText);
+          console.log('✅ Translated (Lingva):', lingvaTranslated);
           consecutiveFailures = 0; // Reset on success
           return lingvaTranslated;
         }
       }
     } catch (lingvaError) {
-      console.log('All translation APIs failed');
+      console.log('💥 All translation APIs failed');
       consecutiveFailures++;
     }
 
     // If all APIs fail, keep original text
-    console.log('All translation attempts failed, keeping original text');
+    console.log('⚠️ All translation attempts failed, keeping original text');
     return text;
 
   } catch (error) {
-    console.error('Translation error:', error);
-    console.log('Keeping original text due to translation failure');
+    console.error('💥 Translation error:', error);
+    console.log('⚠️ Keeping original text due to translation failure');
     consecutiveFailures++;
     return text;
   }
@@ -250,7 +260,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
 
       // Attempt to translate description (assumes English input, translates to Spanish)
       if (description.trim()) {
-        console.log('Original description:', description);
+        console.log('📝 Original description:', description);
         const translated = await translateText(description);
         description = translated;
       }
