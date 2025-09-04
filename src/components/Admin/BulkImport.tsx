@@ -17,26 +17,51 @@ import { Upload as UploadIcon, Download as DownloadIcon, Cancel as CancelIcon } 
 import Papa from 'papaparse';
 import { supabase } from '../../lib/supabase';
 
-// Simple translation function using MyMemory API with rate limiting and length limits
+// Global rate limiting state
+let lastRequestTime = 0;
+let consecutiveFailures = 0;
+const MAX_CONSECUTIVE_FAILURES = 5;
+const BASE_DELAY = 1000; // Increased to 1 second base delay
+const MAX_DELAY = 10000; // Maximum 10 second delay
+
+// Simple translation function using MyMemory API with aggressive rate limiting
 const translateText = async (text: string): Promise<string> => {
   if (!text.trim()) return text;
 
   // Truncate text to stay under 500 character limit
   const truncatedText = text.length > 500 ? text.substring(0, 497) + '...' : text;
 
-  try {
-    // Add delay to avoid rate limiting (100ms between requests)
-    await new Promise(resolve => setTimeout(resolve, 100));
+  // Calculate delay based on consecutive failures (exponential backoff)
+  const currentTime = Date.now();
+  const timeSinceLastRequest = currentTime - lastRequestTime;
+  const requiredDelay = Math.min(BASE_DELAY * Math.pow(2, consecutiveFailures), MAX_DELAY);
+  const actualDelay = Math.max(0, requiredDelay - timeSinceLastRequest);
 
-    // Use MyMemory translation API which is more permissive with CORS
+  if (actualDelay > 0) {
+    console.log(`Rate limiting: waiting ${actualDelay}ms before next request...`);
+    await new Promise(resolve => setTimeout(resolve, actualDelay));
+  }
+
+  try {
+    lastRequestTime = Date.now();
+
+    // Use MyMemory translation API
     const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
       method: 'GET',
     });
 
     if (response.status === 429) {
-      // Rate limited - wait longer and retry once
-      console.log('Rate limited, waiting 2 seconds before retry...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      consecutiveFailures++;
+      console.log(`Rate limited (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}), waiting ${requiredDelay * 2}ms before retry...`);
+
+      // Circuit breaker - if too many consecutive failures, skip translation
+      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        console.log('Too many consecutive failures, skipping translation for this batch');
+        return text;
+      }
+
+      // Wait longer for retry with exponential backoff
+      await new Promise(resolve => setTimeout(resolve, requiredDelay * 2));
 
       const retryResponse = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
         method: 'GET',
@@ -52,11 +77,13 @@ const translateText = async (text: string): Promise<string> => {
       if (retryTranslatedText && retryTranslatedText !== truncatedText && !retryTranslatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
         console.log('Original:', truncatedText);
         console.log('Translated (retry):', retryTranslatedText);
+        consecutiveFailures = 0; // Reset on success
         return retryTranslatedText;
       }
     }
 
     if (!response.ok) {
+      consecutiveFailures++;
       throw new Error('Translation API error');
     }
 
@@ -66,14 +93,17 @@ const translateText = async (text: string): Promise<string> => {
     if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
       console.log('Original:', truncatedText);
       console.log('Translated:', translatedText);
+      consecutiveFailures = 0; // Reset on success
       return translatedText;
     } else {
       console.log('Translation failed or returned same text, keeping original');
+      consecutiveFailures++;
       return text; // Return original (not truncated) text if translation fails
     }
   } catch (error) {
     console.error('Translation error:', error);
     console.log('Keeping original text due to translation failure');
+    consecutiveFailures++;
     return text; // Return original text if translation fails
   }
 };

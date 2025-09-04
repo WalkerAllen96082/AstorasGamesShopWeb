@@ -1,0 +1,6 @@
+cover,name,size,year,platform,price,currency,description,status,genre
+https://example.com/game1.jpg,Test Game 1,50 GB,2024,PC Game,29.99,USD,This is an amazing action game with stunning graphics and immersive gameplay,newly_added,Action
+https://example.com/game2.jpg,Test Game 2,30 GB,2023,PC Game,19.99,USD,An epic adventure game that takes you on a journey through mystical lands,updated,RPG
+https://example.com/game3.jpg,Test Game 3,25 GB,2024,PC Game,39.99,USD,A thrilling racing game with realistic physics and beautiful environments,,Action
+https://example.com/game4.jpg,Test Game 4,40 GB,2022,PC Game,24.99,USD,Experience the ultimate survival challenge in this intense horror game,,Survival Horror
+https://example.com/game5.jpg,Test Game 5,60 GB,2024,PC Game,49.99,USD,Master the art of strategy in this complex and rewarding simulation game,,Estrategia
