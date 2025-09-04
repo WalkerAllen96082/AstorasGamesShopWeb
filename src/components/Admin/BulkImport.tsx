@@ -17,15 +17,44 @@ import { Upload as UploadIcon, Download as DownloadIcon, Cancel as CancelIcon } 
 import Papa from 'papaparse';
 import { supabase } from '../../lib/supabase';
 
-// Simple translation function using MyMemory API (more CORS-friendly)
+// Simple translation function using MyMemory API with rate limiting and length limits
 const translateText = async (text: string): Promise<string> => {
   if (!text.trim()) return text;
 
+  // Truncate text to stay under 500 character limit
+  const truncatedText = text.length > 500 ? text.substring(0, 497) + '...' : text;
+
   try {
+    // Add delay to avoid rate limiting (100ms between requests)
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Use MyMemory translation API which is more permissive with CORS
-    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|es`, {
+    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
       method: 'GET',
     });
+
+    if (response.status === 429) {
+      // Rate limited - wait longer and retry once
+      console.log('Rate limited, waiting 2 seconds before retry...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const retryResponse = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
+        method: 'GET',
+      });
+
+      if (!retryResponse.ok) {
+        throw new Error('Translation API error after retry');
+      }
+
+      const retryData = await retryResponse.json();
+      const retryTranslatedText = retryData.responseData?.translatedText;
+
+      if (retryTranslatedText && retryTranslatedText !== truncatedText && !retryTranslatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
+        console.log('Original:', truncatedText);
+        console.log('Translated (retry):', retryTranslatedText);
+        return retryTranslatedText;
+      }
+    }
 
     if (!response.ok) {
       throw new Error('Translation API error');
@@ -34,13 +63,13 @@ const translateText = async (text: string): Promise<string> => {
     const data = await response.json();
     const translatedText = data.responseData?.translatedText;
 
-    if (translatedText && translatedText !== text) {
-      console.log('Original:', text);
+    if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
+      console.log('Original:', truncatedText);
       console.log('Translated:', translatedText);
       return translatedText;
     } else {
       console.log('Translation failed or returned same text, keeping original');
-      return text;
+      return text; // Return original (not truncated) text if translation fails
     }
   } catch (error) {
     console.error('Translation error:', error);
