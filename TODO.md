@@ -14,3 +14,9 @@
 - Detect language using LibreTranslate detect endpoint
 - Translate only if detected as English (en)
 - Target language: Spanish (es)
+- Translation errors return original text
+- Existing loading indicator covers translation process
+- Updated to MyMemory API due to LibreTranslate CORS issues
+- Implemented aggressive rate limiting with exponential backoff (1s → 2s → 4s → 8s → 10s max)
+- Added circuit breaker - skips translation after 5 consecutive failures
+- Global state tracking prevents multiple simultaneous requests from overwhelming API

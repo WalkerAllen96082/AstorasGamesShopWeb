@@ -20,15 +20,15 @@ import { supabase } from '../../lib/supabase';
 // Global rate limiting state
 let lastRequestTime = 0;
 let consecutiveFailures = 0;
-const MAX_CONSECUTIVE_FAILURES = 5;
-const BASE_DELAY = 1000; // Increased to 1 second base delay
-const MAX_DELAY = 10000; // Maximum 10 second delay
+const MAX_CONSECUTIVE_FAILURES = 3; // Reduced to be more aggressive
+const BASE_DELAY = 30000; // Increased to 30 seconds base delay
+const MAX_DELAY = 60000; // Maximum 60 second delay
 
-// Simple translation function using MyMemory API with aggressive rate limiting
+// Translation function using multiple APIs with fallback
 const translateText = async (text: string): Promise<string> => {
   if (!text.trim()) return text;
 
-  // Truncate text to stay under 500 character limit
+  // Truncate text to stay under API limits
   const truncatedText = text.length > 500 ? text.substring(0, 497) + '...' : text;
 
   // Calculate delay based on consecutive failures (exponential backoff)
@@ -45,7 +45,30 @@ const translateText = async (text: string): Promise<string> => {
   try {
     lastRequestTime = Date.now();
 
-    // Use MyMemory translation API
+    // Try Lingva Translate first (more permissive)
+    console.log('Trying Lingva Translate API...');
+    try {
+      const lingvaResponse = await fetch(`https://lingva.ml/api/v1/en/es/${encodeURIComponent(truncatedText)}`, {
+        method: 'GET',
+      });
+
+      if (lingvaResponse.ok) {
+        const lingvaData = await lingvaResponse.json();
+        const lingvaTranslated = lingvaData.translation;
+
+        if (lingvaTranslated && lingvaTranslated !== truncatedText) {
+          console.log('Original:', truncatedText);
+          console.log('Translated (Lingva):', lingvaTranslated);
+          consecutiveFailures = 0; // Reset on success
+          return lingvaTranslated;
+        }
+      }
+    } catch (lingvaError) {
+      console.log('Lingva Translate failed, trying fallback...');
+    }
+
+    // Fallback to MyMemory with longer delays
+    console.log('Trying MyMemory Translate API...');
     const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
       method: 'GET',
     });
@@ -76,7 +99,7 @@ const translateText = async (text: string): Promise<string> => {
 
       if (retryTranslatedText && retryTranslatedText !== truncatedText && !retryTranslatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
         console.log('Original:', truncatedText);
-        console.log('Translated (retry):', retryTranslatedText);
+        console.log('Translated (MyMemory retry):', retryTranslatedText);
         consecutiveFailures = 0; // Reset on success
         return retryTranslatedText;
       }
@@ -92,7 +115,7 @@ const translateText = async (text: string): Promise<string> => {
 
     if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
       console.log('Original:', truncatedText);
-      console.log('Translated:', translatedText);
+      console.log('Translated (MyMemory):', translatedText);
       consecutiveFailures = 0; // Reset on success
       return translatedText;
     } else {
