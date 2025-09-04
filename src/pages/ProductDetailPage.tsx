@@ -107,7 +107,7 @@ export const ProductDetailPage: React.FC = () => {
           property="og:image"
           content={
             product?.image
-              ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+              ? (product.image.startsWith('http') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
               : 'https://webshopastoras.netlify.app/placeholder.jpg'
           }
         />
@@ -140,7 +140,7 @@ export const ProductDetailPage: React.FC = () => {
                 height="500"
             image={
               product?.image
-                ? `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`
+                ? (product.image.startsWith('http') ? product.image : `https://webshopastoras.netlify.app${product.image.startsWith('/') ? '' : '/'}${product.image}`)
                 : 'https://webshopastoras.netlify.app/placeholder.jpg'
             }
                 alt={product.name}
