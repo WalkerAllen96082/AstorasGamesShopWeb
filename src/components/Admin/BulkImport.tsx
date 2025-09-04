@@ -54,12 +54,12 @@ const translateWithGoogle = async (text: string): Promise<string | null> => {
   return null;
 };
 
-// Translation function with LibreTranslate as primary, fallback to MyMemory and Lingva
+// Translation function with Google Translate as primary, fallback to MyMemory and Lingva
 const translateText = async (text: string): Promise<string> => {
   if (!text.trim()) return text;
 
-  // Truncate text to stay under API limits
-  const truncatedText = text.length > 5000 ? text.substring(0, 4997) + '...' : text;
+  // Use full text from description field (no truncation)
+  const fullText = text;
 
   // Calculate delay based on consecutive failures (exponential backoff)
   const currentTime = Date.now();
@@ -77,7 +77,7 @@ const translateText = async (text: string): Promise<string> => {
 
     // Try Google Translate first (better quality than Lingva)
     console.log('🎯 Trying Google Translate API...');
-    const googleResult = await translateWithGoogle(truncatedText);
+    const googleResult = await translateWithGoogle(fullText);
     if (googleResult !== null) {
       consecutiveFailures = 0; // Reset on success
       return googleResult;
@@ -86,7 +86,7 @@ const translateText = async (text: string): Promise<string> => {
     // Fallback to MyMemory (good quality but rate limited)
     console.log('🔄 Trying MyMemory Translate API...');
     try {
-      const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
+      const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(fullText)}&langpair=en|es`, {
         method: 'GET',
       });
 
@@ -97,8 +97,8 @@ const translateText = async (text: string): Promise<string> => {
         const data = await response.json();
         const translatedText = data.responseData?.translatedText;
 
-        if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
-          console.log('📝 Original:', truncatedText);
+        if (translatedText && translatedText !== fullText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
+          console.log('📝 Original:', fullText);
           console.log('✅ Translated (MyMemory):', translatedText);
           consecutiveFailures = 0; // Reset on success
           return translatedText;
@@ -111,7 +111,7 @@ const translateText = async (text: string): Promise<string> => {
     // Final fallback to Lingva (works but lower quality)
     console.log('🎯 Trying Lingva Translate API...');
     try {
-      const lingvaResponse = await fetch(`https://lingva.ml/api/v1/en/es/${encodeURIComponent(truncatedText)}`, {
+      const lingvaResponse = await fetch(`https://lingva.ml/api/v1/en/es/${encodeURIComponent(fullText)}`, {
         method: 'GET',
       });
 
@@ -119,8 +119,8 @@ const translateText = async (text: string): Promise<string> => {
         const lingvaData = await lingvaResponse.json();
         const lingvaTranslated = lingvaData.translation;
 
-        if (lingvaTranslated && lingvaTranslated !== truncatedText) {
-          console.log('📝 Original:', truncatedText);
+        if (lingvaTranslated && lingvaTranslated !== fullText) {
+          console.log('📝 Original:', fullText);
           console.log('✅ Translated (Lingva):', lingvaTranslated);
           consecutiveFailures = 0; // Reset on success
           return lingvaTranslated;
