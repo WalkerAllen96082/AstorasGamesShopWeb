@@ -17,8 +17,7 @@ import { Upload as UploadIcon, Download as DownloadIcon, Cancel as CancelIcon } 
 import Papa from 'papaparse';
 import { supabase } from '../../lib/supabase';
 
-// Translation utility functions
-const LIBRE_TRANSLATE_URL = 'https://translate.argosopentech.com';
+const LIBRE_TRANSLATE_URL = 'https://libretranslate.de';
 
 const detectLanguage = async (text: string): Promise<string> => {
   try {
