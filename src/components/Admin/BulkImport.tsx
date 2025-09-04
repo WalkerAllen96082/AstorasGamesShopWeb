@@ -24,60 +24,34 @@ const MAX_CONSECUTIVE_FAILURES = 3;
 const BASE_DELAY = 5000; // Reduced to 5 seconds for faster imports
 const MAX_DELAY = 15000; // Reduced to 15 seconds maximum
 
-// LibreTranslate API function (free, open source, better quality than Lingva)
-const translateWithLibre = async (text: string): Promise<string | null> => {
+// Google Translate API function (better quality, reliable)
+const translateWithGoogle = async (text: string): Promise<string | null> => {
   try {
-    console.log('🔄 Attempting LibreTranslate API call...');
-    // Try multiple LibreTranslate instances that support CORS
-    const endpoints = [
-      'https://libretranslate.com/translate',
-      'https://translate.astian.org/translate',
-      'https://translate.mentality.rip/translate'
-    ];
+    console.log('🔄 Attempting Google Translate API call...');
+    const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(text)}`, {
+      method: 'GET',
+    });
 
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`🎯 Trying endpoint: ${endpoint}`);
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            q: text,
-            source: 'en',
-            target: 'es',
-            format: 'text'
-          })
-        });
+    console.log('📊 Google Translate response status:', response.status);
 
-        console.log(`📊 ${endpoint} response status:`, response.status);
-
-        if (response.ok) {
-          const data = await response.json();
-          const translatedText = data.translatedText;
-          console.log('📝 LibreTranslate raw response:', data);
-          if (translatedText && translatedText !== text) {
-            console.log('✅ Translated (LibreTranslate):', translatedText);
-            return translatedText;
-          } else {
-            console.log('⚠️ LibreTranslate returned same text or empty');
-          }
-        } else {
-          console.log(`❌ ${endpoint} failed with status:`, response.status);
-        }
-      } catch (endpointError) {
-        console.log(`💥 ${endpoint} failed:`, endpointError);
-        continue; // Try next endpoint
+    if (response.ok) {
+      const data = await response.json();
+      const translatedText = data[0]?.[0]?.[0];
+      console.log('📝 Google Translate raw response:', data);
+      if (translatedText && translatedText !== text) {
+        console.log('✅ Translated (Google):', translatedText);
+        return translatedText;
+      } else {
+        console.log('⚠️ Google Translate returned same text or empty');
       }
+    } else {
+      console.log('❌ Google Translate failed with status:', response.status);
     }
-
-    console.log('❌ All LibreTranslate endpoints failed');
-    return null;
   } catch (error) {
-    console.log('💥 LibreTranslate error:', error);
-    return null;
+    console.log('💥 Google Translate error:', error);
   }
+
+  return null;
 };
 
 // Translation function with LibreTranslate as primary, fallback to MyMemory and Lingva
@@ -101,12 +75,12 @@ const translateText = async (text: string): Promise<string> => {
   try {
     lastRequestTime = Date.now();
 
-    // Try LibreTranslate first (better quality than Lingva)
-    console.log('🎯 Trying LibreTranslate API...');
-    const libreResult = await translateWithLibre(truncatedText);
-    if (libreResult !== null) {
+    // Try Google Translate first (better quality than Lingva)
+    console.log('🎯 Trying Google Translate API...');
+    const googleResult = await translateWithGoogle(truncatedText);
+    if (googleResult !== null) {
       consecutiveFailures = 0; // Reset on success
-      return libreResult;
+      return googleResult;
     }
 
     // Fallback to MyMemory (good quality but rate limited)
