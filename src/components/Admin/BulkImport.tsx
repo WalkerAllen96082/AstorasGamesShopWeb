@@ -299,4 +299,197 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
         currency: row.currency || 'USD',
         description: translatedDescription,
         status: (row.status === 'newly_added' || row.status === 'updated') ? row.status : null,
-        genre: (row.genre && row.platform === 'PC Game
+        genre: (row.genre && row.platform === 'PC Game') ? row.genre : null,
+        views: 0,
+      };
+    } else if (type === 'product') {
+      // Validate currency
+      const validCurrencies = ['USD', 'CUP'];
+      if (!validCurrencies.includes(row.currency)) {
+        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      }
+
+      // Validate category
+      const validCategories = ['electronics', 'accessory'];
+      if (!validCategories.includes(row.category)) {
+        throw new Error(`Categoría inválida: "${row.category}". Categorías válidas: ${validCategories.join(', ')}`);
+      }
+
+      return {
+        name: row.name || '',
+        price: parseFloat(row.price) || 0,
+        currency: row.currency || 'USD',
+        description: translatedDescription,
+        image: row.image || '',
+        category: row.category || 'electronics',
+      };
+    } else {
+      // Validate currency
+      const validCurrencies = ['USD', 'CUP'];
+      if (!validCurrencies.includes(row.currency)) {
+        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      }
+
+      return {
+        name: row.name || '',
+        price: parseFloat(row.price) || 0,
+        currency: row.currency || 'USD',
+        description: translatedDescription,
+        cover: row.cover || '',
+        duration: row.duration || '',
+      };
+    }
+  };
+
+  const handleImport = async () => {
+    if (!data.length) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const processedData = await processData(data);
+      const tableName = type === 'game' ? 'games' : type === 'product' ? 'products' : 'services';
+
+      const { error } = await supabase
+        .from(tableName)
+        .insert(processedData);
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(`Error de base de datos: ${error.message}. Código: ${error.code}. Detalles: ${error.details || 'No disponible'}`);
+      }
+
+      setSuccess(`Successfully imported ${processedData.length} ${type}s!`);
+      setTimeout(() => {
+        onSuccess();
+      }, 2000);
+    } catch (err) {
+      console.error('Import error:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido durante la importación');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 3 }}>
+      <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+        Bulk Import {type.charAt(0).toUpperCase() + type.slice(1)}s
+      </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      {success && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          {success}
+        </Alert>
+      )}
+
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Step 1: Download Template
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<DownloadIcon />}
+          onClick={generateTemplate}
+          sx={{ mb: 2 }}
+        >
+          Download CSV Template
+        </Button>
+        <Typography variant="body2" color="text.secondary">
+          Descarga el archivo plantilla y llénalo con tus datos de {type}. Campos requeridos: {getRequiredFields().join(', ')}{type === 'game' ? '. Campos opcionales: status, genre (solo para PC Game)' : ''}
+        </Typography>
+      </Box>
+
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Step 2: Upload Your CSV File
+        </Typography>
+        <input
+          accept=".csv"
+          style={{ display: 'none' }}
+          id="csv-upload"
+          type="file"
+          onChange={handleFileUpload}
+        />
+        <label htmlFor="csv-upload">
+          <Button
+            variant="contained"
+            component="span"
+            startIcon={<UploadIcon />}
+            sx={{ mb: 2 }}
+          >
+            Choose CSV File
+          </Button>
+        </label>
+        {file && (
+          <Typography variant="body2" sx={{ ml: 2, display: 'inline' }}>
+            Selected: {file.name}
+          </Typography>
+        )}
+      </Box>
+
+      {data.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Step 3: Review Data ({data.length} rows)
+          </Typography>
+          <TableContainer sx={{ mb: 3, maxHeight: 400 }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  {getAllFields().map((field) => (
+                    <TableCell key={field}>{field}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.slice(0, 10).map((row, index) => (
+                  <TableRow key={index}>
+                    {getAllFields().map((field) => (
+                      <TableCell key={field}>{row[field] || 'N/A'}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {data.length > 10 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Mostrando las primeras 10 filas de {data.length} filas totales
+            </Typography>
+          )}
+        </>
+      )}
+
+      {loading && <LinearProgress sx={{ mb: 2 }} />}
+
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+        <Button
+          variant="outlined"
+          onClick={onCancel}
+          startIcon={<CancelIcon />}
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
+        {data.length > 0 && (
+          <Button
+            variant="contained"
+            onClick={handleImport}
+            startIcon={<UploadIcon />}
+            disabled={loading}
+          >
+            {loading ? 'Importando...' : `Importar ${data.length} Elementos`}
+          </Button>
+        )}
+      </Box>
+    </Paper>
+  );
+};
