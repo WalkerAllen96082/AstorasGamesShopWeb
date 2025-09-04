@@ -1,14 +1,16 @@
-# TODO List for Product Edit Feature Implementation
+# TODO: Implement Automatic Translation for Game Descriptions in Bulk Import
 
-## Completed
-- Updated `src/components/Admin/ProductForm.tsx` to support editing existing products, games, and services.
-  - Added `edit` and `initialData` props.
-  - On submit, updates existing record if `edit` is true, otherwise inserts new record.
-  - Form UI updates to reflect edit mode (title, button text, success message).
-- Fixed `src/components/Admin/ProductList.tsx` to correctly handle onEdit callback for viewing/editing products.
-- Verified `src/components/Admin/AdminDashboard.tsx` integrates edit mode with ProductForm and ProductList components.
+## Steps to Complete
 
-## Next Steps
-- Test the admin dashboard UI to ensure editing existing products works as expected.
-- Fix any bugs or UI issues found during testing.
-- Optionally, add validation or user feedback improvements.
+- [x] Add translation utility function in BulkImport.tsx using LibreTranslate API
+- [x] Modify processData function to detect language and translate English descriptions to Spanish
+- [x] Update handleImport to handle async processData
+- [x] Test bulk import with English descriptions to verify translation works
+- [x] Handle translation errors gracefully (e.g., if API fails, keep original description)
+- [x] Add loading indicator for translation process during import
+
+## Notes
+- Using LibreTranslate public API (https://translate.argosopentech.com/) for free translation
+- Detect language using LibreTranslate detect endpoint
+- Translate only if detected as English (en)
+- Target language: Spanish (es)

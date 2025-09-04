@@ -1,0 +1,4 @@
+cover,name,size,year,platform,price,currency,description,status,genre
+https://example.com/game1.jpg,The Legend of Zelda,10 GB,2023,Nintendo Switch,59.99,USD,An epic adventure game where you explore a vast world filled with puzzles and combat.,newly_added,Action
+https://example.com/game2.jpg,Cyberpunk 2077,50 GB,2020,PC Game,39.99,USD,A futuristic RPG set in a dystopian city with deep storytelling and immersive gameplay.,newly_added,RPG
+https://example.com/game3.jpg,Grand Theft Auto V,80 GB,2013,PC Game,29.99,USD,An open-world action game featuring heists, racing, and a compelling storyline in Los Santos.,newly_added,Action

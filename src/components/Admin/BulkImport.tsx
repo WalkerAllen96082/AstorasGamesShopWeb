@@ -17,6 +17,49 @@ import { Upload as UploadIcon, Download as DownloadIcon, Cancel as CancelIcon } 
 import Papa from 'papaparse';
 import { supabase } from '../../lib/supabase';
 
+// Translation utility functions
+const LIBRE_TRANSLATE_URL = 'https://translate.argosopentech.com';
+
+const detectLanguage = async (text: string): Promise<string> => {
+  try {
+    const response = await fetch(`${LIBRE_TRANSLATE_URL}/detect`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ q: text }),
+    });
+    const data = await response.json();
+    return data[0]?.language || 'unknown';
+  } catch (error) {
+    console.error('Language detection error:', error);
+    return 'unknown';
+  }
+};
+
+const translateText = async (text: string, sourceLang: string, targetLang: string): Promise<string> => {
+  if (sourceLang === targetLang) return text;
+
+  try {
+    const response = await fetch(`${LIBRE_TRANSLATE_URL}/translate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: text,
+        source: sourceLang,
+        target: targetLang,
+      }),
+    });
+    const data = await response.json();
+    return data.translatedText || text;
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text; // Return original text if translation fails
+  }
+};
+
 interface BulkImportProps {
   type: 'game' | 'product' | 'service';
   onCancel: () => void;
@@ -116,86 +159,103 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     });
   };
 
-  const processData = (rawData: Record<string, string>[]) => {
-    return rawData.map((row: Record<string, string>) => {
-      if (type === 'game') {
-        // Validate platform
-        const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable', 'PlayStation Vita'];
-        if (!validPlatforms.includes(row.platform)) {
-          throw new Error(`Plataforma inválida: "${row.platform}". Plataformas válidas: ${validPlatforms.join(', ')}`);
-        }
+  const processData = async (rawData: Record<string, string>[]) => {
+    const processedRows = [];
+    for (const row of rawData) {
+      let description = row.description || '';
 
-        // Validate currency
-        const validCurrencies = ['USD', 'CUP'];
-        if (!validCurrencies.includes(row.currency)) {
-          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      // Detect language and translate if English
+      if (description.trim()) {
+        const detectedLang = await detectLanguage(description);
+        if (detectedLang === 'en') {
+          description = await translateText(description, 'en', 'es');
         }
-
-        // Validate status if provided
-        const validStatuses = ['newly_added', 'updated', '', null, undefined];
-        if (row.status && !validStatuses.includes(row.status)) {
-          throw new Error(`Estado inválido: "${row.status}". Estados válidos: newly_added, updated (o dejar vacío)`);
-        }
-
-        // Validate genre if provided and platform is PC Game
-        if (row.genre && row.platform === 'PC Game') {
-          const validGenres = ['Action', 'Action RPG', 'Aventura Gráfica', 'Aventura-Acción', 'Beat Em-Up', 'Conducción', 'Estrategia', 'Fighting', 'Hack and Slash', 'Metroidvania', 'MMO', 'Musou', 'Plataformas', 'Rogelike', 'RPG', 'Shooter', 'Simulación', 'Sports', 'Survival', 'Survival Horror'];
-          if (!validGenres.includes(row.genre)) {
-            throw new Error(`Género inválido: "${row.genre}". Géneros válidos para PC Game: ${validGenres.join(', ')}`);
-          }
-        }
-
-        return {
-          cover: row.cover || '',
-          name: row.name || '',
-          size: row.size || '',
-          year: parseInt(row.year) || new Date().getFullYear(),
-          platform: row.platform || '',
-          price: parseFloat(row.price) || 0,
-          currency: row.currency || 'USD',
-          description: row.description || '',
-          status: (row.status === 'newly_added' || row.status === 'updated') ? row.status : null,
-          genre: (row.genre && row.platform === 'PC Game') ? row.genre : null,
-          views: 0,
-        };
-      } else if (type === 'product') {
-        // Validate currency
-        const validCurrencies = ['USD', 'CUP'];
-        if (!validCurrencies.includes(row.currency)) {
-          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
-        }
-
-        // Validate category
-        const validCategories = ['electronics', 'accessory'];
-        if (!validCategories.includes(row.category)) {
-          throw new Error(`Categoría inválida: "${row.category}". Categorías válidas: ${validCategories.join(', ')}`);
-        }
-
-        return {
-          name: row.name || '',
-          price: parseFloat(row.price) || 0,
-          currency: row.currency || 'USD',
-          description: row.description || '',
-          image: row.image || '',
-          category: row.category || 'electronics',
-        };
-      } else {
-        // Validate currency
-        const validCurrencies = ['USD', 'CUP'];
-        if (!validCurrencies.includes(row.currency)) {
-          throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
-        }
-
-        return {
-          name: row.name || '',
-          price: parseFloat(row.price) || 0,
-          currency: row.currency || 'USD',
-          description: row.description || '',
-          cover: row.cover || '',
-          duration: row.duration || '',
-        };
       }
-    });
+
+      const processedRow = processRow(row, description);
+      processedRows.push(processedRow);
+    }
+    return processedRows;
+  };
+
+  const processRow = (row: Record<string, string>, translatedDescription: string) => {
+    if (type === 'game') {
+      // Validate platform
+      const validPlatforms = ['PC Game', 'PlayStation 4', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Xbox One', 'Xbox Series', 'Nintendo WiiU', 'Nintendo Wii', 'Nintendo 3DS', 'PlayStation 2', 'PlayStation Portable', 'PlayStation Vita'];
+      if (!validPlatforms.includes(row.platform)) {
+        throw new Error(`Plataforma inválida: "${row.platform}". Plataformas válidas: ${validPlatforms.join(', ')}`);
+      }
+
+      // Validate currency
+      const validCurrencies = ['USD', 'CUP'];
+      if (!validCurrencies.includes(row.currency)) {
+        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      }
+
+      // Validate status if provided
+      const validStatuses = ['newly_added', 'updated', '', null, undefined];
+      if (row.status && !validStatuses.includes(row.status)) {
+        throw new Error(`Estado inválido: "${row.status}". Estados válidos: newly_added, updated (o dejar vacío)`);
+      }
+
+      // Validate genre if provided and platform is PC Game
+      if (row.genre && row.platform === 'PC Game') {
+        const validGenres = ['Action', 'Action RPG', 'Aventura Gráfica', 'Aventura-Acción', 'Beat Em-Up', 'Conducción', 'Estrategia', 'Fighting', 'Hack and Slash', 'Metroidvania', 'MMO', 'Musou', 'Plataformas', 'Rogelike', 'RPG', 'Shooter', 'Simulación', 'Sports', 'Survival', 'Survival Horror'];
+        if (!validGenres.includes(row.genre)) {
+          throw new Error(`Género inválido: "${row.genre}". Géneros válidos para PC Game: ${validGenres.join(', ')}`);
+        }
+      }
+
+      return {
+        cover: row.cover || '',
+        name: row.name || '',
+        size: row.size || '',
+        year: parseInt(row.year) || new Date().getFullYear(),
+        platform: row.platform || '',
+        price: parseFloat(row.price) || 0,
+        currency: row.currency || 'USD',
+        description: translatedDescription,
+        status: (row.status === 'newly_added' || row.status === 'updated') ? row.status : null,
+        genre: (row.genre && row.platform === 'PC Game') ? row.genre : null,
+        views: 0,
+      };
+    } else if (type === 'product') {
+      // Validate currency
+      const validCurrencies = ['USD', 'CUP'];
+      if (!validCurrencies.includes(row.currency)) {
+        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      }
+
+      // Validate category
+      const validCategories = ['electronics', 'accessory'];
+      if (!validCategories.includes(row.category)) {
+        throw new Error(`Categoría inválida: "${row.category}". Categorías válidas: ${validCategories.join(', ')}`);
+      }
+
+      return {
+        name: row.name || '',
+        price: parseFloat(row.price) || 0,
+        currency: row.currency || 'USD',
+        description: translatedDescription,
+        image: row.image || '',
+        category: row.category || 'electronics',
+      };
+    } else {
+      // Validate currency
+      const validCurrencies = ['USD', 'CUP'];
+      if (!validCurrencies.includes(row.currency)) {
+        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
+      }
+
+      return {
+        name: row.name || '',
+        price: parseFloat(row.price) || 0,
+        currency: row.currency || 'USD',
+        description: translatedDescription,
+        cover: row.cover || '',
+        duration: row.duration || '',
+      };
+    }
   };
 
   const handleImport = async () => {
@@ -205,7 +265,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     setError('');
 
     try {
-      const processedData = processData(data);
+      const processedData = await processData(data);
       const tableName = type === 'game' ? 'games' : type === 'product' ? 'products' : 'services';
 
       const { error } = await supabase
