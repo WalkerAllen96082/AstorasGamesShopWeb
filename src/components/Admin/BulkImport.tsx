@@ -24,12 +24,43 @@ const MAX_CONSECUTIVE_FAILURES = 3; // Reduced to be more aggressive
 const BASE_DELAY = 30000; // Increased to 30 seconds base delay
 const MAX_DELAY = 60000; // Maximum 60 second delay
 
-// Translation function using multiple APIs with fallback
+// LibreTranslate API function (free, open source, better quality than Lingva)
+const translateWithLibre = async (text: string): Promise<string | null> => {
+  try {
+    const response = await fetch('https://translate.argosopentech.com/translate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: text,
+        source: 'en',
+        target: 'es',
+        format: 'text'
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const translatedText = data.translatedText;
+      if (translatedText && translatedText !== text) {
+        console.log('Translated (LibreTranslate):', translatedText);
+        return translatedText;
+      }
+    }
+  } catch (error) {
+    console.log('LibreTranslate failed:', error);
+  }
+
+  return null;
+};
+
+// Translation function with LibreTranslate as primary, fallback to MyMemory and Lingva
 const translateText = async (text: string): Promise<string> => {
   if (!text.trim()) return text;
 
   // Truncate text to stay under API limits
-  const truncatedText = text.length > 500 ? text.substring(0, 497) + '...' : text;
+  const truncatedText = text.length > 5000 ? text.substring(0, 4997) + '...' : text;
 
   // Calculate delay based on consecutive failures (exponential backoff)
   const currentTime = Date.now();
@@ -45,7 +76,40 @@ const translateText = async (text: string): Promise<string> => {
   try {
     lastRequestTime = Date.now();
 
-    // Try Lingva Translate first (more permissive)
+    // Try LibreTranslate first (better quality than Lingva)
+    console.log('Trying LibreTranslate API...');
+    const libreResult = await translateWithLibre(truncatedText);
+    if (libreResult !== null) {
+      consecutiveFailures = 0; // Reset on success
+      return libreResult;
+    }
+
+    // Fallback to MyMemory (good quality but rate limited)
+    console.log('Trying MyMemory Translate API...');
+    try {
+      const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
+        method: 'GET',
+      });
+
+      if (response.status === 429) {
+        consecutiveFailures++;
+        console.log(`MyMemory rate limited (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}), trying Lingva...`);
+      } else if (response.ok) {
+        const data = await response.json();
+        const translatedText = data.responseData?.translatedText;
+
+        if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
+          console.log('Original:', truncatedText);
+          console.log('Translated (MyMemory):', translatedText);
+          consecutiveFailures = 0; // Reset on success
+          return translatedText;
+        }
+      }
+    } catch (mymemoryError) {
+      console.log('MyMemory failed, trying Lingva...');
+    }
+
+    // Final fallback to Lingva (works but lower quality)
     console.log('Trying Lingva Translate API...');
     try {
       const lingvaResponse = await fetch(`https://lingva.ml/api/v1/en/es/${encodeURIComponent(truncatedText)}`, {
@@ -64,70 +128,19 @@ const translateText = async (text: string): Promise<string> => {
         }
       }
     } catch (lingvaError) {
-      console.log('Lingva Translate failed, trying fallback...');
-    }
-
-    // Fallback to MyMemory with longer delays
-    console.log('Trying MyMemory Translate API...');
-    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
-      method: 'GET',
-    });
-
-    if (response.status === 429) {
+      console.log('All translation APIs failed');
       consecutiveFailures++;
-      console.log(`Rate limited (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}), waiting ${requiredDelay * 2}ms before retry...`);
-
-      // Circuit breaker - if too many consecutive failures, skip translation
-      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-        console.log('Too many consecutive failures, skipping translation for this batch');
-        return text;
-      }
-
-      // Wait longer for retry with exponential backoff
-      await new Promise(resolve => setTimeout(resolve, requiredDelay * 2));
-
-      const retryResponse = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncatedText)}&langpair=en|es`, {
-        method: 'GET',
-      });
-
-      if (!retryResponse.ok) {
-        throw new Error('Translation API error after retry');
-      }
-
-      const retryData = await retryResponse.json();
-      const retryTranslatedText = retryData.responseData?.translatedText;
-
-      if (retryTranslatedText && retryTranslatedText !== truncatedText && !retryTranslatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
-        console.log('Original:', truncatedText);
-        console.log('Translated (MyMemory retry):', retryTranslatedText);
-        consecutiveFailures = 0; // Reset on success
-        return retryTranslatedText;
-      }
     }
 
-    if (!response.ok) {
-      consecutiveFailures++;
-      throw new Error('Translation API error');
-    }
+    // If all APIs fail, keep original text
+    console.log('All translation attempts failed, keeping original text');
+    return text;
 
-    const data = await response.json();
-    const translatedText = data.responseData?.translatedText;
-
-    if (translatedText && translatedText !== truncatedText && !translatedText.includes('QUERY LENGTH LIMIT EXCEEDED')) {
-      console.log('Original:', truncatedText);
-      console.log('Translated (MyMemory):', translatedText);
-      consecutiveFailures = 0; // Reset on success
-      return translatedText;
-    } else {
-      console.log('Translation failed or returned same text, keeping original');
-      consecutiveFailures++;
-      return text; // Return original (not truncated) text if translation fails
-    }
   } catch (error) {
     console.error('Translation error:', error);
     console.log('Keeping original text due to translation failure');
     consecutiveFailures++;
-    return text; // Return original text if translation fails
+    return text;
   }
 };
 
@@ -167,7 +180,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
   const generateTemplate = () => {
     const fields = getAllFields();
     let csvContent = fields.join(',') + '\n';
-    
+
     // Add example row for better understanding
     if (type === 'game') {
       csvContent += 'https://example.com/cover.jpg,Game Name,50 GB,2024,PC Game,29.99,USD,Game description,newly_added,Action\n';
@@ -176,7 +189,7 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
     } else {
       csvContent += 'https://example.com/cover.jpg,Service Name,49.99,USD,Service description,1 hour\n';
     }
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -203,28 +216,28 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
           setError(`CSV parsing error: ${errorMsg}. Please ensure your CSV has the correct format with all required fields: ${getRequiredFields().join(', ')}`);
           return;
         }
-        
+
         // Filter out empty rows and validate
         const validData = (results.data as Record<string, string>[]).filter(row => {
           // Check if row has at least some data
           return Object.values(row).some(value => value && String(value).trim() !== '');
         });
-        
+
         if (validData.length === 0) {
           setError('No valid data found in CSV. Please check your file format.');
           return;
         }
-        
+
         // Validate required fields
         const requiredFields = getRequiredFields();
         const headers = Object.keys(validData[0] || {});
         const missingFields = requiredFields.filter(field => !headers.includes(field));
-        
+
         if (missingFields.length > 0) {
           setError(`Faltan campos requeridos: ${missingFields.join(', ')}. Por favor asegúrate de que tu CSV tenga todas las columnas requeridas. Campos opcionales: ${type === 'game' ? 'status, genre' : 'ninguno'}`);
           return;
         }
-        
+
         setData(validData);
       },
     });
@@ -286,197 +299,4 @@ export const BulkImport: React.FC<BulkImportProps> = ({ type, onCancel, onSucces
         currency: row.currency || 'USD',
         description: translatedDescription,
         status: (row.status === 'newly_added' || row.status === 'updated') ? row.status : null,
-        genre: (row.genre && row.platform === 'PC Game') ? row.genre : null,
-        views: 0,
-      };
-    } else if (type === 'product') {
-      // Validate currency
-      const validCurrencies = ['USD', 'CUP'];
-      if (!validCurrencies.includes(row.currency)) {
-        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
-      }
-
-      // Validate category
-      const validCategories = ['electronics', 'accessory'];
-      if (!validCategories.includes(row.category)) {
-        throw new Error(`Categoría inválida: "${row.category}". Categorías válidas: ${validCategories.join(', ')}`);
-      }
-
-      return {
-        name: row.name || '',
-        price: parseFloat(row.price) || 0,
-        currency: row.currency || 'USD',
-        description: translatedDescription,
-        image: row.image || '',
-        category: row.category || 'electronics',
-      };
-    } else {
-      // Validate currency
-      const validCurrencies = ['USD', 'CUP'];
-      if (!validCurrencies.includes(row.currency)) {
-        throw new Error(`Moneda inválida: "${row.currency}". Monedas válidas: ${validCurrencies.join(', ')}`);
-      }
-
-      return {
-        name: row.name || '',
-        price: parseFloat(row.price) || 0,
-        currency: row.currency || 'USD',
-        description: translatedDescription,
-        cover: row.cover || '',
-        duration: row.duration || '',
-      };
-    }
-  };
-
-  const handleImport = async () => {
-    if (!data.length) return;
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const processedData = await processData(data);
-      const tableName = type === 'game' ? 'games' : type === 'product' ? 'products' : 'services';
-
-      const { error } = await supabase
-        .from(tableName)
-        .insert(processedData);
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw new Error(`Error de base de datos: ${error.message}. Código: ${error.code}. Detalles: ${error.details || 'No disponible'}`);
-      }
-
-      setSuccess(`Successfully imported ${processedData.length} ${type}s!`);
-      setTimeout(() => {
-        onSuccess();
-      }, 2000);
-    } catch (err) {
-      console.error('Import error:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido durante la importación');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Bulk Import {type.charAt(0).toUpperCase() + type.slice(1)}s
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {success}
-        </Alert>
-      )}
-
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Step 1: Download Template
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon />}
-          onClick={generateTemplate}
-          sx={{ mb: 2 }}
-        >
-          Download CSV Template
-        </Button>
-        <Typography variant="body2" color="text.secondary">
-          Descarga el archivo plantilla y llénalo con tus datos de {type}. Campos requeridos: {getRequiredFields().join(', ')}{type === 'game' ? '. Campos opcionales: status, genre (solo para PC Game)' : ''}
-        </Typography>
-      </Box>
-
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Step 2: Upload Your CSV File
-        </Typography>
-        <input
-          accept=".csv"
-          style={{ display: 'none' }}
-          id="csv-upload"
-          type="file"
-          onChange={handleFileUpload}
-        />
-        <label htmlFor="csv-upload">
-          <Button
-            variant="contained"
-            component="span"
-            startIcon={<UploadIcon />}
-            sx={{ mb: 2 }}
-          >
-            Choose CSV File
-          </Button>
-        </label>
-        {file && (
-          <Typography variant="body2" sx={{ ml: 2, display: 'inline' }}>
-            Selected: {file.name}
-          </Typography>
-        )}
-      </Box>
-
-      {data.length > 0 && (
-        <>
-          <Typography variant="h6" gutterBottom>
-            Step 3: Review Data ({data.length} rows)
-          </Typography>
-          <TableContainer sx={{ mb: 3, maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  {getAllFields().map((field) => (
-                    <TableCell key={field}>{field}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.slice(0, 10).map((row, index) => (
-                  <TableRow key={index}>
-                    {getAllFields().map((field) => (
-                      <TableCell key={field}>{row[field] || 'N/A'}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {data.length > 10 && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Mostrando las primeras 10 filas de {data.length} filas totales
-            </Typography>
-          )}
-        </>
-      )}
-
-      {loading && <LinearProgress sx={{ mb: 2 }} />}
-
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button
-          variant="outlined"
-          onClick={onCancel}
-          startIcon={<CancelIcon />}
-          disabled={loading}
-        >
-          Cancelar
-        </Button>
-        {data.length > 0 && (
-          <Button
-            variant="contained"
-            onClick={handleImport}
-            startIcon={<UploadIcon />}
-            disabled={loading}
-          >
-            {loading ? 'Importando...' : `Importar ${data.length} Elementos`}
-          </Button>
-        )}
-      </Box>
-    </Paper>
-  );
-};
+        genre: (row.genre && row.platform === 'PC Game
